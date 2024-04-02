@@ -2,9 +2,16 @@
 
 This is WIP.
 
-Wanted to implement RAG from scratch without using LlamaIndex.
+All of this can be done using LlamaIndex in far fewer lines of code.
+This repo is to implement the core components of a RAG pipeline.
 
-Raw implementation of chunking + sentence window retrieval to get context for user query.
+
+## What does it have right now ?
+- Q&A for 1 pdf using local embeddings, brute force retrieval and openAI LLMs.
+- Raw implementation of chunking + sentence window retrieval to get context for user query.
+- 
+
+
 
 
 ## What else can I do with this?
