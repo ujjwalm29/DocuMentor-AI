@@ -1,0 +1,5 @@
+./venv
+.env
+*.pkl
+.idea/
+markdowns/*

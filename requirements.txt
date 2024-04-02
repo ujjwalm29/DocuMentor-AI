@@ -1,0 +1,9 @@
+llama-parse
+python-dotenv
+pandas
+numpy
+spacy
+langchain
+sentence-transformers
+scikit-learn
+openai
