@@ -8,21 +8,24 @@ import os
 
 load_dotenv()
 
-parser = LlamaParse(
-    api_key=os.getenv("LLAMA_PDF_API_KEY"),  # can also be set in your env as LLAMA_CLOUD_API_KEY
-)
+
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class PdfParser:
 
-    def __init__(self, file_path: str, result_type: str = 'md', text_splitter: TextSplitter = NaiveTextSplitter()):
+    def __init__(self, file_path: str, result_type: str = 'md', text_splitter: TextSplitter = NaiveTextSplitter(), parsing_instructs: str = ""):
         self.file_path = file_path
         self.text_splitter = text_splitter
         self.result_type = result_type
+        self.parsing_instructs = parsing_instructs
 
-    def get_text_from_pdf(self):
+    def get_text_from_pdf(self, ):
+        parser = LlamaParse(
+            api_key=os.getenv("LLAMA_PDF_API_KEY"),
+            parsing_instruction=self.parsing_instructs
+        )
         if self.result_type.lower() == 'txt':
             parser.result_type = ResultType.TXT
         elif self.result_type.lower() == 'md':
@@ -41,7 +44,7 @@ class PdfParser:
             with open(parsed_file_path, "w") as file:
                 file.write(documents[0].text)
 
-            return documents[0]
+            return documents[0].text
 
         else:
             with open(parsed_file_path, "r") as file:

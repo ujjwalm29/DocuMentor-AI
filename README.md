@@ -18,7 +18,15 @@ This repo is to implement the core components of a RAG pipeline.
 
 - ~~Modularize Code~~
 - ~~Introduce classes~~
-- Improve Chunking - Explore different methods (Top Priority).
+- ~~Integrate other LLMs~~ (OpenAI, Claude, Perplexity added. Gimme $5 I'll add Gemini as well)
+- Improve Parsing.
+  - User is probably ok in waiting for a few extra seconds to ingest data
+  - Parsing instructions in LlamaParse?
+  - For research paper indexing, the references can be avoided while indexing
+- Chunking 
+  - Different Characters
+  - Check LangChain splitters.
+  - Some other heuristic splitters?
 - Multiple PDFs
 - Store embeddings efficiently.
 - Embeddings options

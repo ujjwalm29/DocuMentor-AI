@@ -4,6 +4,7 @@ from retrieval.local_dataframe import LocalDataframe
 from retrieval.sentence_window import SentenceWindowRetrieval
 from generation.openai_chat import ChatOpenAI
 from generation.claude_chat import ChatClaude
+from generation.pplx_chat import ChatPplx
 
 import os
 import pandas as pd
@@ -16,7 +17,10 @@ pkl_file_name = ''.join(file_path.split('/')[-1].split('.')[:-1]) + '.pkl'
 pkl_file_path = os.path.join('data', 'pkl', pkl_file_name)
 
 embeddings = LocalEmbeddings(file_path=file_path, embeddings_model="mixedbread-ai/mxbai-embed-large-v1")
-pdf_parser = PdfParser(file_path=file_path)
+pdf_parser = PdfParser(file_path=file_path, parsing_instructs="""
+You are parsing a research paper. DO NOT parse or include the references section in the output. 
+Convert tables into a list of facts. 
+""")
 
 if not os.path.exists(pkl_file_path):
     df = pdf_parser.parse_pdf()
