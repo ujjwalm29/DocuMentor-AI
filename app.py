@@ -1,14 +1,15 @@
 from ingestion.pdf import PdfParser
 from embeddings.local import LocalEmbeddings
-from retrieval.local_dataframe import sentence_window_retrieval
+from retrieval.local_dataframe import LocalDataframe
+from retrieval.sentence_window import SentenceWindowRetrieval
 from generation.openai_chat import generate_response
 
 import os
 import pandas as pd
 from dotenv import load_dotenv
 
-
 load_dotenv()
+
 file_path = 'data/pdf/amazon-dynamo-sosp2007.pdf'
 pkl_file_name = ''.join(file_path.split('/')[-1].split('.')[:-1]) + '.pkl'
 pkl_file_path = os.path.join('data', 'pkl', pkl_file_name)
@@ -25,7 +26,9 @@ else:
 query = "What are some problems with dynamo?"
 query_embedding = embeddings.get_embedding([query])
 
-final_results = sentence_window_retrieval(df, query_embedding)
+retrieval = LocalDataframe(SentenceWindowRetrieval())
+
+final_results = retrieval.get_results(df, query_embedding)
 
 for result in final_results:
     print(result)

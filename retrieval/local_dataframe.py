@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+from retrieval.base_retrieval import BaseRetrieval
 
 
 def get_similarity_query_dataframe(df: pd.DataFrame, query_embedding):
@@ -12,12 +13,12 @@ def get_similarity_query_dataframe(df: pd.DataFrame, query_embedding):
     return top_indices
 
 
-def sentence_window_retrieval(df: pd.DataFrame, query_embedding):
-    top_indices = get_similarity_query_dataframe(df, query_embedding)
+class LocalDataframe:
 
-    final_results = []
+    def __init__(self, retrieval_strategy: BaseRetrieval = BaseRetrieval()):
+        self.retrieval_strategy = retrieval_strategy
 
-    for index in top_indices:
-        final_results.append(' '.join(df.iloc[index - 1:index + 1]['sentence']))
+    def get_results(self, df: pd.DataFrame, query_embedding):
+        top_indices = get_similarity_query_dataframe(df, query_embedding)
 
-    return final_results
+        return self.retrieval_strategy.get_context(top_indices, df)
