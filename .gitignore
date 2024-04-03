@@ -2,4 +2,5 @@
 .env
 *.pkl
 .idea/
-markdowns/*
+data/*/*
+__pycache__

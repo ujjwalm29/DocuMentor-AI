@@ -16,14 +16,14 @@ This repo is to implement the core components of a RAG pipeline.
 
 ## What else can I do with this?
 
-- Modularize Code
+- ~~Modularize Code~~
+- ~~Introduce classes~~
 - Improve Chunking - Explore different methods (Top Priority).
 - Multiple PDFs
 - Store embeddings efficiently.
 - Embeddings options
 - Create Streamlit UI
 - Create Dockerfile
-- Introduce classes
 - Deploy somewhere
 - Evaluation using Tru Lens
 - Tests :(

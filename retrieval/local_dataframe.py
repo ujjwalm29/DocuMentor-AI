@@ -18,7 +18,6 @@ def sentence_window_retrieval(df: pd.DataFrame, query_embedding):
     final_results = []
 
     for index in top_indices:
-        print(df.iloc[index]['sentence'])
         final_results.append(' '.join(df.iloc[index - 1:index + 1]['sentence']))
 
     return final_results
