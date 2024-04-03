@@ -2,7 +2,8 @@ from ingestion.pdf import PdfParser
 from embeddings.local import LocalEmbeddings
 from retrieval.local_dataframe import LocalDataframe
 from retrieval.sentence_window import SentenceWindowRetrieval
-from generation.openai_chat import generate_response
+from generation.openai_chat import ChatOpenAI
+from generation.claude_chat import ChatClaude
 
 import os
 import pandas as pd
@@ -33,4 +34,6 @@ final_results = retrieval.get_results(df, query_embedding)
 for result in final_results:
     print(result)
 
-print(generate_response(query, final_results))
+generation = ChatClaude()
+
+print(generation.get_message(query, final_results))

@@ -7,3 +7,4 @@ langchain
 sentence-transformers
 scikit-learn
 openai
+anthropic
