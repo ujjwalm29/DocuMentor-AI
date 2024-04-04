@@ -4,3 +4,4 @@
 .idea/
 data/*/*
 __pycache__
+*.json

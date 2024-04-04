@@ -4,6 +4,7 @@ pandas
 numpy
 spacy
 langchain
+langchain-ai21
 sentence-transformers
 scikit-learn
 openai

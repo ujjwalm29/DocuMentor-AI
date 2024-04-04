@@ -12,18 +12,24 @@ class Chat:
     Do not mention citations. Do not make an indication that you are a RAG tool. Be succinct.
     """
 
-    def get_user_rag_prompt(self, query: str, contexts):
+    def get_user_start_query(self, query:str):
         return f"""
     The user's query is : {query}
-    ```
-    context 1 : {contexts[0]}
-    ```
-    ```
-    context 2 : {contexts[1]}
-    ```
-    ```
-    context 3 : {contexts[2]}
-    ```
+    """
+
+
+    def get_user_rag_prompt(self, query: str, contexts):
+
+        context_string = []
+
+        for context, i in enumerate(contexts):
+            context_string.append(f"""
+            ```
+            context {i} : {context}
+            ```
+            """)
+
+        return self.get_user_start_query(query) + '\n'.join(context_string) + f"""\n
     No yapping. Answer the query based on the info provided in the context.
     Do NOT add any of your own information.
     """
