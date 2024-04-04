@@ -2,16 +2,12 @@
 
 This is WIP.
 
-All of this can be done using LlamaIndex in far fewer lines of code.
-This repo is to implement the core components of a RAG pipeline.
+This repo is to implement the core components of a RAG pipeline from scratch to understand the various aspects of a good RAG system.
 
 
 ## What does it have right now ?
-- Q&A for 1 pdf using local embeddings, brute force retrieval and openAI LLMs.
-- Raw implementation of chunking + sentence window retrieval to get context for user query.
-- 
 
-
+Q&A for pdfs using various embeddings(local, API), text splitters, retrieval strategies, retrieval sources and LLMs like OpenAI, Claude and Perplexity.
 
 
 ## Tasks and General Notes
