@@ -3,12 +3,16 @@ from typing import List
 from ingestion.chunking.Chunk import ParentChunk, ChildChunk
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from embeddings.local import LocalEmbeddings
+from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
+import numpy as np
 import itertools
 import random
+import os
+from collections import Counter
 
 
-def create_custom_id_generator(min_id=-2147483648, max_id=2147483647):
+def create_custom_id_generator(min_id=0, max_id=2147483647):
     """
     Creates a generator that yields unique IDs within the specified range.
     The generator combines a sequential counter and a random offset to produce IDs.
@@ -63,12 +67,16 @@ class ChunkingController:
         for split in splits:
             new_chunk_id = self.id_generator()  # Generate a new unique ID
             prev_chunk.next_id = new_chunk_id
+
+            if split == "":
+                continue
+
             new_chunk = ChildChunk(
                 id=new_chunk_id,
                 text=split,
                 prev_id=prev_chunk.id,
                 next_id=-1,  # Will be updated later or remains -1 if it's the last chunk
-                embeddings=[],
+                embeddings=self.embedding_generator.get_embedding(split),
                 metadata={},
                 parent_id=-1
             )
@@ -101,10 +109,25 @@ class ChunkingController:
         # first split it into children and create a linked list of Chunks
         splits = self.child_text_splitter.split_text(text)
 
-        children_chunks_df = self.create_chunks_from_splits_children(splits)
+        if os.path.exists('./children.pkl'):
+            children_chunks_df = pd.read_pickle('./children.pkl')
+        else:
+            children_chunks_df = self.create_chunks_from_splits_children(splits)
+
+
 
         # Then combine 4 at a time, create parent Chunk and assign parent_ids to child nodes
-        self.create_parent_chunks_using_child_chunks(children_chunks_df)
+        if os.path.exists('./parent.pkl'):
+            parent_chunks_df = pd.read_pickle('./parent.pkl')
+        else:
+            parent_chunks_df = self.create_parent_chunks_using_child_chunks(children_chunks_df)
+            parent_chunks_df.to_pickle('./parent.pkl')
+            children_chunks_df.to_pickle('./children.pkl')
+
+        print(children_chunks_df.iloc[0])
+        print(parent_chunks_df.iloc[0])
+
+        self.auto_merging_retrieval("What are the parameters N,R,W in Dynamo?", children_chunks_df, parent_chunks_df)
 
     def create_parent_chunks_using_child_chunks(self, children_chunks_df):
 
@@ -173,5 +196,58 @@ class ChunkingController:
             cur_child_chunk = chunks_df.loc[cur_child_chunk.next_id]
 
         return sub_child_chunks, cur_child_chunk
+
+
+    def auto_merging_retrieval(self, query: str, children_chunks_df: pd.DataFrame, parent_chunks_df: pd.DataFrame):
+        df_embeddings = pd.DataFrame(children_chunks_df['embeddings'].tolist())
+        print(df_embeddings)
+        similarities = cosine_similarity(self.embedding_generator.get_embedding([query]), df_embeddings).flatten()
+
+        top_indices = np.argsort(similarities)[::-1][:30]
+
+        # Now, it's time to merge
+        # Get a map Of parent IDs, count_of_children
+        # Extract the 'parent_id' for the given indices directly from the DataFrame
+        parent_ids = children_chunks_df.loc[top_indices, 'parent_id']
+
+        # Use Counter to count the frequency of each parent_id
+        parent_count_map = Counter(parent_ids)
+
+        # In final results, sort by top 5. If parent has count>2, don't add child, add parent
+        # Store info so parent or any child of parent don't get added to the top 5.
+        top_indices = top_indices[:10]
+
+        used_parent = set()
+
+        final_context = []
+
+        for index in top_indices:
+            parent_id = children_chunks_df.loc[index, 'parent_id']
+
+            if parent_id in used_parent:
+                continue
+
+            if parent_count_map[parent_id] > 2:
+                print("Putting parent..")
+                final_context.append(parent_chunks_df.loc[parent_id, 'text'])
+                used_parent.add(parent_id)
+            else:
+                final_context.append(children_chunks_df.loc[index, 'text'])
+
+            if len(final_context) >= 5:
+                break
+
+        print(final_context)
+
+
+    def sentence_window_retrieval(self, query: str, children_chunks_df: pd.DataFrame, parent_chunks_df: pd.DataFrame, window_size: int):
+        df_embeddings = pd.DataFrame(children_chunks_df['embedding'].tolist())
+        similarities = cosine_similarity(self.embedding_generator.get_embedding(query), df_embeddings).flatten()
+
+        top_indices = np.argsort(similarities)[::-1][:5]
+
+        # parse from node to back, node to front using IDs. Make sure to keep track of order.
+
+        # send results
 
 
