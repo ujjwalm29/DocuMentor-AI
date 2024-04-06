@@ -42,9 +42,10 @@ class ChunkingController:
 
     def __init__(self):
         self.id_generator = create_custom_id_generator()
+        self.embedding_generator = LocalEmbeddings('not_needed')
 
         self.head_child_chunk = ChildChunk(self.id_generator(), "", -1, -1, [], {}, -1)
-        self.tail_child_chunk = ChildChunk(self.id_generator(), "", -1, -1, [], {}, -1)
+        self.tail_child_chunk = ChildChunk(self.id_generator(), "", -1, -1, self.embedding_generator.get_embedding("random"), {}, -1)
         self.head_child_chunk.next_id = self.tail_child_chunk.id
         self.tail_child_chunk.next_id = self.head_child_chunk.id
 
@@ -53,10 +54,10 @@ class ChunkingController:
         self.head_parent_chunk.next_id = self.tail_parent_chunk.id
         self.tail_parent_chunk.next_id = self.head_parent_chunk.id
 
-        self.parent_text_splitter = RecursiveCharacterTextSplitter(chunk_size=1200)
-        self.child_text_splitter = RecursiveCharacterTextSplitter(chunk_size=300)
         self.child_parent_ratio = 4
-        self.embedding_generator = LocalEmbeddings('not_needed')
+        self.child_text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=0)
+        self.parent_text_splitter = RecursiveCharacterTextSplitter(chunk_size=200*self.child_parent_ratio, chunk_overlap=0)
+
 
     def create_chunks_from_splits_children(self, splits):
         prev_chunk = self.head_child_chunk
@@ -109,6 +110,10 @@ class ChunkingController:
         # first split it into children and create a linked list of Chunks
         splits = self.child_text_splitter.split_text(text)
 
+        for split, i in enumerate(splits):
+            print(f"{i} -------------- \n{split}")
+
+
         if os.path.exists('./children.pkl'):
             children_chunks_df = pd.read_pickle('./children.pkl')
         else:
@@ -124,10 +129,11 @@ class ChunkingController:
             parent_chunks_df.to_pickle('./parent.pkl')
             children_chunks_df.to_pickle('./children.pkl')
 
-        print(children_chunks_df.iloc[0])
-        print(parent_chunks_df.iloc[0])
+        # print(children_chunks_df.iloc[0])
+        # print(parent_chunks_df.iloc[0])
 
-        self.auto_merging_retrieval("What are the parameters N,R,W in Dynamo?", children_chunks_df, parent_chunks_df)
+        #self.auto_merging_retrieval("What are the parameters N,R,W in Dynamo?", children_chunks_df, parent_chunks_df)
+        self.sentence_window_retrieval("What are the parameters N,R,W in Dynamo?", children_chunks_df, 1)
 
     def create_parent_chunks_using_child_chunks(self, children_chunks_df):
 
@@ -200,18 +206,22 @@ class ChunkingController:
 
     def auto_merging_retrieval(self, query: str, children_chunks_df: pd.DataFrame, parent_chunks_df: pd.DataFrame):
         df_embeddings = pd.DataFrame(children_chunks_df['embeddings'].tolist())
-        print(df_embeddings)
         similarities = cosine_similarity(self.embedding_generator.get_embedding([query]), df_embeddings).flatten()
 
         top_indices = np.argsort(similarities)[::-1][:30]
 
         # Now, it's time to merge
         # Get a map Of parent IDs, count_of_children
-        # Extract the 'parent_id' for the given indices directly from the DataFrame
-        parent_ids = children_chunks_df.loc[top_indices, 'parent_id']
+        # Get the integer position of the 'parent_id' column
+        parent_id_col_pos = children_chunks_df.columns.get_loc('parent_id')
+
+        # Use .iloc with top_indices and the column position to access 'parent_id' values
+        parent_ids = children_chunks_df.iloc[top_indices, parent_id_col_pos]
 
         # Use Counter to count the frequency of each parent_id
         parent_count_map = Counter(parent_ids)
+
+        print(parent_count_map)
 
         # In final results, sort by top 5. If parent has count>2, don't add child, add parent
         # Store info so parent or any child of parent don't get added to the top 5.
@@ -222,7 +232,7 @@ class ChunkingController:
         final_context = []
 
         for index in top_indices:
-            parent_id = children_chunks_df.loc[index, 'parent_id']
+            parent_id = children_chunks_df.iloc[index]['parent_id']
 
             if parent_id in used_parent:
                 continue
@@ -232,21 +242,79 @@ class ChunkingController:
                 final_context.append(parent_chunks_df.loc[parent_id, 'text'])
                 used_parent.add(parent_id)
             else:
-                final_context.append(children_chunks_df.loc[index, 'text'])
+                final_context.append(children_chunks_df.iloc[index]['text'])
 
             if len(final_context) >= 5:
                 break
 
-        print(final_context)
+
+        return final_context
 
 
-    def sentence_window_retrieval(self, query: str, children_chunks_df: pd.DataFrame, parent_chunks_df: pd.DataFrame, window_size: int):
-        df_embeddings = pd.DataFrame(children_chunks_df['embedding'].tolist())
-        similarities = cosine_similarity(self.embedding_generator.get_embedding(query), df_embeddings).flatten()
+    def sentence_window_retrieval(self, query: str, children_chunks_df: pd.DataFrame, window_size: int):
+        df_embeddings = pd.DataFrame(children_chunks_df['embeddings'].tolist())
+        similarities = cosine_similarity(self.embedding_generator.get_embedding([query]), df_embeddings).flatten()
 
         top_indices = np.argsort(similarities)[::-1][:5]
 
+        print(top_indices)
+
+        final_context = []
+
         # parse from node to back, node to front using IDs. Make sure to keep track of order.
+        for index in top_indices:
+            cur_node = children_chunks_df.iloc[index]
+
+            prev_node = children_chunks_df.loc[cur_node['prev_id']]
+            context_before = []
+            while len(context_before) < window_size and prev_node.name != self.head_child_chunk.id:
+                context_before.append(prev_node['text'])
+                prev_node = children_chunks_df.loc[prev_node['prev_id']]
+
+            context_before.reverse()
+
+            next_node = children_chunks_df.loc[cur_node['next_id']]
+            context_after = []
+            while len(context_after) < window_size and next_node.name != self.tail_child_chunk.id:
+                context_after.append(next_node['text'])
+                next_node = children_chunks_df.loc[next_node['next_id']]
+
+            print("context before")
+            for context in context_before:
+                print(context)
+
+            print("From DF")
+
+            print(children_chunks_df.iloc[index-1]['text'])
+
+            print("---")
+
+            print()
+            print("cur")
+            print(cur_node.text)
+            print("From DF")
+            print(children_chunks_df.iloc[index]['text'])
+            print("---")
+
+            print()
+            print("context after")
+            for context in context_after:
+                print(context)
+
+            print()
+            print("From DF")
+            print(children_chunks_df.iloc[index+1]['text'])
+            print("---")
+
+            concat_context = ''.join(context_before) + cur_node.text + ''.join(context_after)
+
+            final_context.append(concat_context)
+
+        for context in final_context:
+            print()
+            print(context)
+
+        return final_context
 
         # send results
 

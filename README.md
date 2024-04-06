@@ -40,26 +40,32 @@ Q&A for pdfs using various embeddings(local, API), text splitters, retrieval str
   - Some other heuristic splitters.
 - Context Retrieval Strategy
   - Closely related to Chunking.
-  - Challenge : Create a chunking + storage strategy that is agnostic of retrieval strategy 
+  - Challenge : Create a chunking + storage strategy that is agnostic of retrieval strategy and storage medium(vectorDB, localStore).✅
+    - Challenge Accepted : Created POC of a linked list based object store. Implemented Auto Merge Retrieval and Sentence Window Retrieval. POC is [here](https://github.com/ujjwalm29/pdf-reader/blob/main/ingestion/chunking/ChunkingController.py).✅   
   - Basic Context Retrieval ✅
   - Sentence Window Retrieval ✅
-  - Auto Merging Retrieval (Tree Based)
+  - Auto Merging Retrieval (Tree Based) (Implemented using chunking+storage strategy)✅
 - Core Retrieval
   - Embeddings options 
   - Store embeddings efficiently.
   - Integrate Vector DBs.
   - Option for attaching Postgres/Elasticsearch instance for search.
   - Advanced retrieval techniques (2 stage, IVFOPQ, int8 vectors)
+  - Adaptive retrieval using Matryoshka Representations. [Reference](https://ujjwalm29.medium.com/matryoshka-representation-learning-a-guide-to-faster-semantic-search-1c9025543530) 
 - Features 
   - Multiple PDFs (should be easy, just repeat everything for each file)
 - Deployment and Productization 
+  - Logging using loggers and NOT print statements lol.
   - Create Streamlit UI
   - Create Dockerfile
   - Deploy somewhere
   - Tests :(
 - PI removal 
 - Evaluation using Tru Lens
-- Multi-Query
+- Multi-Query(Query Expansion)
+  - Old school, semantic Knowledge graphs created using SpaCy or leveraging inverted+forward index.
+    - Can create alternate words, but how to create sentences?
+  - Using LLMs : Feed the query to an LLM, ask it to expand on it and give 3 alternatives. Search and aggregate results.
 
 
 
