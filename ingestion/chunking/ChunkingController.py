@@ -2,7 +2,7 @@ from typing import List
 
 from ingestion.chunking.Chunk import ParentChunk, ChildChunk
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from embeddings.local import LocalEmbeddings
+from embeddings.LocalHFEmbeddings import LocalEmbeddings
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 import numpy as np
@@ -109,10 +109,6 @@ class ChunkingController:
     def split_text(self, text: str):
         # first split it into children and create a linked list of Chunks
         splits = self.child_text_splitter.split_text(text)
-
-        for split, i in enumerate(splits):
-            print(f"{i} -------------- \n{split}")
-
 
         if os.path.exists('./children.pkl'):
             children_chunks_df = pd.read_pickle('./children.pkl')
@@ -279,33 +275,6 @@ class ChunkingController:
                 context_after.append(next_node['text'])
                 next_node = children_chunks_df.loc[next_node['next_id']]
 
-            print("context before")
-            for context in context_before:
-                print(context)
-
-            print("From DF")
-
-            print(children_chunks_df.iloc[index-1]['text'])
-
-            print("---")
-
-            print()
-            print("cur")
-            print(cur_node.text)
-            print("From DF")
-            print(children_chunks_df.iloc[index]['text'])
-            print("---")
-
-            print()
-            print("context after")
-            for context in context_after:
-                print(context)
-
-            print()
-            print("From DF")
-            print(children_chunks_df.iloc[index+1]['text'])
-            print("---")
-
             concat_context = ''.join(context_before) + cur_node.text + ''.join(context_after)
 
             final_context.append(concat_context)
@@ -315,7 +284,3 @@ class ChunkingController:
             print(context)
 
         return final_context
-
-        # send results
-
-

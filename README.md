@@ -5,7 +5,7 @@ This is WIP.
 This repo is to implement the core components of a RAG pipeline from scratch to understand the various aspects of a good RAG system.
 
 
-## What does it have right now ?
+## Highlights 
 
 Q&A for pdfs using various embeddings(local, API), text splitters, retrieval strategies, retrieval sources and LLMs like OpenAI, Claude and Perplexity.
 
@@ -39,19 +39,24 @@ Q&A for pdfs using various embeddings(local, API), text splitters, retrieval str
     - Context window sizes will be a problem.
   - Some other heuristic splitters.
 - Context Retrieval Strategy
-  - Closely related to Chunking.
   - Challenge : Create a chunking + storage strategy that is agnostic of retrieval strategy and storage medium(vectorDB, localStore).✅
-    - Challenge Accepted : Created POC of a linked list based object store. Implemented Auto Merge Retrieval and Sentence Window Retrieval. POC is [here](https://github.com/ujjwalm29/pdf-reader/blob/main/ingestion/chunking/ChunkingController.py).✅   
+    - Challenge Accepted : Created POC of a linked list based Parent and child object store. Implemented Auto Merge Retrieval and Sentence Window Retrieval. POC is [here](https://github.com/ujjwalm29/pdf-reader/blob/main/ingestion/chunking/ChunkingController.py).✅   
   - Basic Context Retrieval ✅
   - Sentence Window Retrieval ✅
   - Auto Merging Retrieval (Tree Based) (Implemented using chunking+storage strategy)✅
 - Core Retrieval
-  - Embeddings options 
-  - Store embeddings efficiently.
+  - Embeddings
+    - Create Embeddings locally ✅ - HuggingFace sentence-transformers library
+    - Create embeddings through API ✅ - OpenAI embeddings supported.
+    - Store embeddings efficiently.
+    - Advanced retrieval techniques (IVFOPQ, int8 vectors, binary quantization) ❌- Not really needed here. Examples available in [my retrieval guide.](https://github.com/ujjwalm29/movie-search/tree/master/level_6_faiss_IVFOPQ_HNSW)
+    - Adaptive retrieval using Matryoshka Representations.❌- Not really needed here. Example given in my [medium](https://ujjwalm29.medium.com/matryoshka-representation-learning-a-guide-to-faster-semantic-search-1c9025543530) article.
   - Integrate Vector DBs.
-  - Option for attaching Postgres/Elasticsearch instance for search.
-  - Advanced retrieval techniques (2 stage, IVFOPQ, int8 vectors)
-  - Adaptive retrieval using Matryoshka Representations. [Reference](https://ujjwalm29.medium.com/matryoshka-representation-learning-a-guide-to-faster-semantic-search-1c9025543530) 
+  - Use Hybrid search
+  - Option for attaching Postgres/Elasticsearch(or Solr, Opensearch etc) instance for search.❌
+    - Is it possible to do search using SQL? [Levels.fyi did it](https://www.levels.fyi/blog/scalable-search-with-postgres.html)
+    - MOST people usually move things to Elasticsearch for keyword search.
+    - Hence, if you're using SQL, move data to a search engine(like Solr etc) which can do good hybrid search.
 - Features 
   - Multiple PDFs (should be easy, just repeat everything for each file)
 - Deployment and Productization 
@@ -74,4 +79,6 @@ Q&A for pdfs using various embeddings(local, API), text splitters, retrieval str
 - Build a proxy for multiple LLM API providers?
 - How to use llama parse effectively?
 - A guide to chunking strategies
+- Write about chunking POC.
+- Write about each section
 - 

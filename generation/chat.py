@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class Chat:
+class Chat(ABC):
     def get_system_prompt(self):
         return f"""
     You are a Retrieval Augmented Generation application.

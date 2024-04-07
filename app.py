@@ -2,7 +2,7 @@ from ingestion.pdf import PdfParser
 from ingestion.chunking.markdown_splitter import MarkdownTextParser
 from ingestion.chunking.AI21_splitter import AI21TextParser
 from ingestion.chunking.recursive_splitter import RecursiveTextSplitter
-from embeddings.local import LocalEmbeddings
+from embeddings.LocalHFEmbeddings import LocalEmbeddings
 from retrieval.local_dataframe import LocalDataframe
 from retrieval.sentence_window import SentenceWindowRetrieval
 from generation.openai_chat import ChatOpenAI
@@ -12,6 +12,7 @@ from generation.pplx_chat import ChatPplx
 import os
 import pandas as pd
 from dotenv import load_dotenv
+from ingestion.chunking.ChunkingController import ChunkingController
 
 load_dotenv()
 
@@ -47,3 +48,7 @@ generation = ChatOpenAI()
 
 print()
 print(generation.get_message(query, final_results))
+
+
+# chunking_controller = ChunkingController()
+# chunking_controller.split_text(pdf_parser.get_text_from_pdf())
