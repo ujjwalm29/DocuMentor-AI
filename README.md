@@ -71,6 +71,12 @@ Q&A for pdfs using various embeddings(local, API), text splitters, retrieval str
   - Old school, semantic Knowledge graphs created using SpaCy or leveraging inverted+forward index.
     - Can create alternate words, but how to create sentences?
   - Using LLMs : Feed the query to an LLM, ask it to expand on it and give 3 alternatives. Search and aggregate results.
+- Summarization pipeline
+  - Sometimes, people just want summaries of pdfs.
+- How does one build a chat interface over RAG?
+  - Let's say, I ask a question and get an answer. What's next?
+  - Is the next prompt considered a new question? Do we do retrieval -> generation?
+  - What if it's a follow up to the answer? Like "explain the previous answer like I'm 5"?
 
 
 
