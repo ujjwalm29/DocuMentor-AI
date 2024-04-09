@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class BaseRetrieval(ABC):
+class BaseRetrieval():
 
     @abstractmethod
     def get_context(self, top_indices, df):

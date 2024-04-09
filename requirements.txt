@@ -9,3 +9,4 @@ sentence-transformers
 scikit-learn
 openai
 anthropic
+weaviate-client
