@@ -1,7 +1,7 @@
 from llama_parse import LlamaParse, ResultType
 from dotenv import load_dotenv
-from ingestion.chunking.naive_text_splitter import NaiveTextSplitter
-from ingestion.chunking.text_splitter import TextSplitter
+from ingestion.splitters.naive_text_splitter import NaiveTextSplitter
+from ingestion.splitters.text_splitter import TextSplitter
 import pandas as pd
 
 import os

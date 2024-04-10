@@ -1,5 +1,5 @@
 from langchain_ai21 import AI21SemanticTextSplitter
-from ingestion.chunking.text_splitter import TextSplitter
+from ingestion.splitters.text_splitter import TextSplitter
 
 
 class AI21TextParser(TextSplitter):

@@ -1,15 +1,14 @@
 from abc import ABC, abstractmethod
+from typing import List
+
 import pandas as pd
+from ingestion.chunking.Chunk import ChunkBase
 
 
 class Embeddings(ABC):
 
     @abstractmethod
-    def process_row(self, row):
-        pass
-
-    @abstractmethod
-    def get_embeddings_for_dataframe(self, df: pd.DataFrame):
+    def get_embeddings_for_chunks(self, chunks: List[ChunkBase]):
         pass
 
     @abstractmethod

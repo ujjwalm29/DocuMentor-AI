@@ -1,14 +1,15 @@
 from dataclasses import dataclass
 from typing import List
+from uuid import UUID
 
 
 @dataclass
 class ChunkBase:
 
-    id: int
+    id: UUID
     text: str
-    prev_id: int
-    next_id: int
+    prev_id: UUID | None
+    next_id: UUID | None
     embeddings: List[float]
     metadata: object
 
@@ -22,4 +23,4 @@ class ParentChunk(ChunkBase):
 @dataclass
 class ChildChunk(ChunkBase):
 
-    parent_id: int
+    parent_id: UUID | None

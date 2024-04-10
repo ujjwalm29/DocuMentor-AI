@@ -5,9 +5,28 @@ This is WIP.
 This repo is to implement the core components of a RAG pipeline from scratch to understand the various aspects of a good RAG system.
 
 
-## Highlights 
+## Features
 
-Q&A for pdfs using various embeddings(local, API), text splitters, retrieval strategies, retrieval sources and LLMs like OpenAI, Claude and Perplexity.
+Q&A for pdfs.
+- How does the PDF get parsed? This step is called Parsing.
+  - Using LlamaParse by LlamaIndex.
+  - Pypdf3 can also be used.
+- We need to store the file contents somehow. Can't store the full file as it's not efficient for search and retrieval. How is the text divided? This step is called chunking/splitting.
+  - LangChain framework has several text splitters like MarkdownSplitter, Recursive Splitter etc.
+  - Can develop your own splitter by using regex.
+  - Can use AI21 splitter via API.
+- How do we store and get documents? This is the core retrieval part.
+  - Use a simple pandas Dataframe and store it in a pickle file for persistence storage.
+  - Use a vector Database - Weaviate added, Vectara soon to be added.
+  - Use a traditional search engine like Elasticsearch, Solr, Opensearch.
+  - The lines between Vector DB and the Elastic, Solr etc are blurry. Both do pretty much the same thing.
+- When we get some top N search results for a query, how do we use the results? This is the context retrieval strategy.
+  - Simple Retrieval Strategy : Use the top N results and pass it to the the next stage.
+  - Sentence window retrieval : If a certain piece of text matches our query, it is possible that the sentences surrounding that text will also be relevant as context. So, fetch results. Then fetch the text around the retrieved results.
+  - Auto Merging Retrieval : In this structure, the chunks are in a tree structure. There are parent chunks, each having N(usually 4) child chunks. If the retrieved results contain >= N/2 children of a particular parent, it is likely that the parent block in itself is relevant to the query.
+- Challenge : How do you build a framework where it doesn't matter whether you're using a Dataframe, Vector DB, Solr etc and it doesn't matter what context retrieval strategy is used?
+  - LlamaIndex and Langchain do this sort of out-of-the-box.
+  - I implemented my own linked list based strategy which can be used to solve this.
 
 
 ## Tasks and General Notes
@@ -51,12 +70,15 @@ Q&A for pdfs using various embeddings(local, API), text splitters, retrieval str
     - Store embeddings efficiently.
     - Advanced retrieval techniques (IVFOPQ, int8 vectors, binary quantization) ❌- Not really needed here. Examples available in [my retrieval guide.](https://github.com/ujjwalm29/movie-search/tree/master/level_6_faiss_IVFOPQ_HNSW)
     - Adaptive retrieval using Matryoshka Representations.❌- Not really needed here. Example given in my [medium](https://ujjwalm29.medium.com/matryoshka-representation-learning-a-guide-to-faster-semantic-search-1c9025543530) article.
-  - Integrate Vector DBs.
-  - Use Hybrid search
+  - Integrate Vector DBs. ✅ - Added Weaviate. About to get Vectara credits, will add soon
+    - Issue ❗- Need to build an abstraction such that getting results from database or pkl file should be easily swappable.
+    - Issue ❗- Need to convert chunking strategy into an abstraction and implementable for dataframe, vector DB etc 
+  - Use Hybrid search ✅ - Through weaviate. Abstraction pending
   - Option for attaching Postgres/Elasticsearch(or Solr, Opensearch etc) instance for search.❌
     - Is it possible to do search using SQL? [Levels.fyi did it](https://www.levels.fyi/blog/scalable-search-with-postgres.html)
     - MOST people usually move things to Elasticsearch for keyword search.
     - Hence, if you're using SQL, move data to a search engine(like Solr etc) which can do good hybrid search.
+    - I am aware of Elasticsearch basics, will add Elasticsearch integration
 - Features 
   - Multiple PDFs (should be easy, just repeat everything for each file)
 - Deployment and Productization 

@@ -1,8 +1,11 @@
+from typing import List
+
 import pandas as pd
 from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 import Embeddings
+from ingestion.chunking.Chunk import ChunkBase
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -11,40 +14,31 @@ class OpenAIEmbeddings(Embeddings):
 
     def __init__(
         self,
-        file_path: str,
         embeddings_model: str = "text-embedding-3-small"
     ):
-        self.file_path = file_path
-        self.client = OpenAI(api_key=os.getenv("API_KEY"))
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = embeddings_model
 
+    def get_embeddings_for_chunks(self, chunks: List[ChunkBase]):
+        texts = [obj.text for obj in chunks]
 
-    def process_row(self, row):
-        cleaned_sentence = row['sentence'].replace("\n", " ")
-        embedding = self.get_embedding(cleaned_sentence)
-        return pd.Series([cleaned_sentence, embedding], index=['sentence', 'embedding'])
-
-
-    def get_embeddings_for_dataframe(self, df: pd.DataFrame):
-        futures = []
-        results = []
         with ThreadPoolExecutor() as executor:
-            for _, row in df.iterrows():
-                futures.append(executor.submit(self.process_row, row))
+            # Submit all tasks to the executor
+            future_to_text = {executor.submit(self.get_embedding, text): text for text in texts}
 
-            for future in as_completed(futures):
-                results.append(future.result())
+            # Collect the results as they are completed
+            results = []
+            for future in as_completed(future_to_text):
+                try:
+                    result = future.result()
+                    results.append(result)
+                except Exception as exc:
+                    print(f'Generated an exception: {exc}')
 
-        new_df = pd.DataFrame(results)
-        df['sentence'], df['embedding'] = new_df['sentence'], new_df['embedding']
+        for obj, embedding in zip(chunks, results):
+            obj.embeddings = embedding
 
-        if self.file_path != "":
-            new_file_name = ''.join(self.file_path.split('/')[-1].split('.')[:-1]) + '.pkl'
-            pkl_file_path = os.path.join(PROJECT_ROOT, 'data', 'pkl', new_file_name)
-            df.to_pickle(pkl_file_path)
-
-        return df
-
+        return chunks
 
     def get_embedding(self, input_str):
         return self.client.embeddings.create(input=[input_str], model=self.model).data[0].embedding

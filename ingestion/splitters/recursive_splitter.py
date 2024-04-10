@@ -1,5 +1,5 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from ingestion.chunking.text_splitter import TextSplitter
+from ingestion.splitters.text_splitter import TextSplitter
 
 
 class RecursiveTextSplitter(TextSplitter):

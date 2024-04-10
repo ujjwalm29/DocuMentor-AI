@@ -1,5 +1,5 @@
 from langchain.text_splitter import CharacterTextSplitter
-from ingestion.chunking.text_splitter import TextSplitter
+from ingestion.splitters.text_splitter import TextSplitter
 
 
 class NaiveTextSplitter(TextSplitter):
