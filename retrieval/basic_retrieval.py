@@ -1,10 +1,10 @@
 from typing import List
 
 from ingestion.chunking.Chunk import ChildChunk
-from retrieval.base_retrieval import BaseRetrieval
+from retrieval.base_retrieval import Retrieval
 
 
-class BasicRetrieval(BaseRetrieval):
+class BasicRetrieval(Retrieval):
 
     def get_context(self, top_results: List[ChildChunk]):
         top_results = top_results[:5]

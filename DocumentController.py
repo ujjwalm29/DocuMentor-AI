@@ -7,7 +7,7 @@ from ingestion.storage.storage import Storage
 from ingestion.storage.weaviate import Weaviate
 from ingestion.chunking.Chunker import Chunker
 from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME
-from retrieval.base_retrieval import BaseRetrieval
+from retrieval.base_retrieval import Retrieval
 from retrieval.sentence_window import SentenceWindowRetrieval
 from retrieval.auto_merge import AutoMergeRetrieval
 from util import get_dataclass_fields
@@ -22,7 +22,7 @@ class DocumentController:
     def __init__(self, splitter: TextSplitter = RecursiveTextSplitter(),
                  embedding: Embeddings = LocalEmbeddings(),
                  storage: Storage = Weaviate(),
-                 retrieval: BaseRetrieval = AutoMergeRetrieval()):
+                 retrieval: Retrieval = AutoMergeRetrieval()):
         self.splitter = splitter
         self.embedding = embedding
         self.storage = storage

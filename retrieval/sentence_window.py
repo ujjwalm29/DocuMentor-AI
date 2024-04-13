@@ -1,10 +1,10 @@
 from ingestion.storage.weaviate import Weaviate
 from ingestion.storage.storage import Storage
-from retrieval.base_retrieval import BaseRetrieval
+from retrieval.base_retrieval import Retrieval
 from constants import CHILD_CHUNKS_INDEX_NAME
 
 
-class SentenceWindowRetrieval(BaseRetrieval):
+class SentenceWindowRetrieval(Retrieval):
 
     def __init__(self, storage: Storage = Weaviate(), adjacent_neighbor_window_size: int = 1):
         """

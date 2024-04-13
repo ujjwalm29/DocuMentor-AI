@@ -4,7 +4,7 @@ from typing import List
 from ingestion.chunking.Chunk import ChunkBase
 
 
-class BaseRetrieval(ABC):
+class Retrieval(ABC):
 
     @abstractmethod
     def get_context(self, top_results: List[ChunkBase]) -> List[str]:

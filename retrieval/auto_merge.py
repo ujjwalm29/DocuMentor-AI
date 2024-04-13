@@ -4,11 +4,11 @@ from typing import List
 from ingestion.chunking.Chunk import ChildChunk
 from ingestion.storage.storage import Storage
 from ingestion.storage.weaviate import Weaviate
-from retrieval.base_retrieval import BaseRetrieval
+from retrieval.base_retrieval import Retrieval
 from constants import PARENTS_CHUNK_INDEX_NAME
 
 
-class AutoMergeRetrieval(BaseRetrieval):
+class AutoMergeRetrieval(Retrieval):
 
     def __init__(self, storage: Storage = Weaviate()):
         self.storage = storage
