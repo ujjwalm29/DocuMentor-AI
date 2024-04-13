@@ -15,6 +15,7 @@ class SentenceWindowRetrieval(BaseRetrieval):
         self.storage = storage
 
     def get_context(self, top_results):
+        top_results = top_results[:5]
         final_results = []
 
         for chunk in top_results:

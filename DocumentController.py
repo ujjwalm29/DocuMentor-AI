@@ -9,6 +9,7 @@ from ingestion.chunking.Chunker import Chunker
 from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME
 from retrieval.base_retrieval import BaseRetrieval
 from retrieval.sentence_window import SentenceWindowRetrieval
+from retrieval.auto_merge import AutoMergeRetrieval
 from util import get_dataclass_fields
 
 
@@ -21,7 +22,7 @@ class DocumentController:
     def __init__(self, splitter: TextSplitter = RecursiveTextSplitter(),
                  embedding: Embeddings = LocalEmbeddings(),
                  storage: Storage = Weaviate(),
-                 retrieval: BaseRetrieval = SentenceWindowRetrieval()):
+                 retrieval: BaseRetrieval = AutoMergeRetrieval()):
         self.splitter = splitter
         self.embedding = embedding
         self.storage = storage
@@ -33,6 +34,7 @@ class DocumentController:
 
 
         self.storage.delete_index(CHILD_CHUNKS_INDEX_NAME)
+        self.storage.delete_index(PARENTS_CHUNK_INDEX_NAME)
 
         child_data_dict = get_dataclass_fields(ChildChunk)
         self.storage.create_new_index_if_not_exists(CHILD_CHUNKS_INDEX_NAME, child_data_dict)
@@ -48,14 +50,15 @@ class DocumentController:
         self.storage.add_data_to_index(CHILD_CHUNKS_INDEX_NAME, children_chunks)
         self.storage.add_data_to_index(PARENTS_CHUNK_INDEX_NAME, parent_chunks)
 
-        self.storage.close_connection()
-
 
     def search_and_retrieve_result(self, query: str):
 
         vector = self.embedding.get_embedding(query)
-        results = self.storage.vector_search(CHILD_CHUNKS_INDEX_NAME, vector, 5)
+        results = self.storage.hybrid_search(index_name=CHILD_CHUNKS_INDEX_NAME, query_vector=vector, query_str=query)
         final_context = self.retrieval.get_context(results)
+        print(final_context)
+
+        self.storage.close_connection()
 
         return final_context
 

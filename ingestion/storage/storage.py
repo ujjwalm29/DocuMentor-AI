@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import List, Dict
 from uuid import uuid4
 
+from ingestion.chunking.Chunk import ChunkBase
+
 
 class Storage(ABC):
 
@@ -29,17 +31,17 @@ class Storage(ABC):
 
 
     @abstractmethod
-    def get_element_by_chunk_id(self, index_name: str, element_id: uuid4):
+    def get_element_by_chunk_id(self, index_name: str, element_id: uuid4) -> ChunkBase:
         pass
 
 
     @abstractmethod
-    def vector_search(self, index_name: str, query_vector, number_of_results: int):
+    def vector_search(self, index_name: str, query_vector, number_of_results: int) -> List[ChunkBase]:
         pass
 
 
     @abstractmethod
-    def hybrid_search(self, index_name: str, query_vector, query_str: str, number_of_results: int, query_properties: List[str]):
+    def hybrid_search(self, index_name: str, query_vector, query_str: str, number_of_results: int, query_properties: List[str]) -> List[ChunkBase]:
         pass
 
 

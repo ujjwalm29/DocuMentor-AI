@@ -90,12 +90,12 @@ class Weaviate(Storage):
     def get_element_by_chunk_id(self, index_name: str, element_id: uuid4) -> ChildChunk:
         element = self.client.collections.get(index_name).query.fetch_object_by_id(str(element_id))
 
-        return self.create_child_chunk_from_weaviate_object(element)
+        return self.create_chunk_from_weaviate_objects(index_name, element)
 
-    def vector_search(self, index_name: str, query_vector, number_of_results: int):
+    def vector_search(self, index_name: str, query_vector, number_of_results: int = 20):
         response = self.client.collections.get(index_name).query.near_vector(
             near_vector=query_vector.tolist(),
-            limit=5
+            limit=number_of_results
         )
 
         # results = [entry.properties['text'] for entry in response.objects]
@@ -103,33 +103,47 @@ class Weaviate(Storage):
         response_chunks = []
 
         for obj in response.objects:
-            response_chunks.append(self.create_child_chunk_from_weaviate_object(obj))
+            response_chunks.append(self.create_chunk_from_weaviate_objects(index_name, obj))
 
         return response_chunks
 
-    def hybrid_search(self, index_name: str, query_vector, query_str: str, number_of_results: int, query_properties: List[str]="text"):
+    def hybrid_search(self, index_name: str, query_vector, query_str: str, number_of_results: int = 20, query_properties: List[str]="text"):
         response = self.client.collections.get(index_name).query.hybrid(
             query=query_str,
             query_properties=[query_properties],
-            vector=query_vector,
-            limit=5
+            vector=query_vector.tolist(),
+            limit=number_of_results
         )
 
-        results = [entry.properties['text'] for entry in response.objects]
+        response_chunks = []
 
-        return results
+        for obj in response.objects:
+            response_chunks.append(self.create_chunk_from_weaviate_objects(index_name, obj))
+
+        return response_chunks
 
     def close_connection(self):
         self.client.close()
 
 
-    def create_child_chunk_from_weaviate_object(self, obj):
-        return ChildChunk(
-            chunk_id=obj.uuid,
-            parent_id=obj.properties['parent_id'],
-            next_id=obj.properties['next_id'],
-            prev_id=obj.properties['prev_id'],
-            text=obj.properties['text'],
-            embeddings=[],
-            metadata={}
-        )
+    def create_chunk_from_weaviate_objects(self, index_name, obj):
+        if index_name == CHILD_CHUNKS_INDEX_NAME:
+            return ChildChunk(
+                chunk_id=obj.uuid,
+                parent_id=obj.properties['parent_id'],
+                next_id=obj.properties['next_id'],
+                prev_id=obj.properties['prev_id'],
+                text=obj.properties['text'],
+                embeddings=[],
+                metadata={}
+            )
+        else:
+            return ParentChunk(
+                chunk_id=obj.uuid,
+                number_of_children=obj.properties['number_of_children'],
+                next_id=obj.properties['next_id'],
+                prev_id=obj.properties['prev_id'],
+                text=obj.properties['text'],
+                embeddings=[],
+                metadata={}
+            )

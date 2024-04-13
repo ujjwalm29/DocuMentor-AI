@@ -71,22 +71,29 @@ Q&A for pdfs.
     - Advanced retrieval techniques (IVFOPQ, int8 vectors, binary quantization) ❌- Not really needed here. Examples available in [my retrieval guide.](https://github.com/ujjwalm29/movie-search/tree/master/level_6_faiss_IVFOPQ_HNSW)
     - Adaptive retrieval using Matryoshka Representations.❌- Not really needed here. Example given in my [medium](https://ujjwalm29.medium.com/matryoshka-representation-learning-a-guide-to-faster-semantic-search-1c9025543530) article.
   - Integrate Vector DBs. ✅ - Added Weaviate. About to get Vectara credits, will add soon
-    - Issue ❗- Need to build an abstraction such that getting results from database or pkl file should be easily swappable.
-    - Issue ❗- Need to convert chunking strategy into an abstraction and implementable for dataframe, vector DB etc 
+    - Issue ❗- Need to build an abstraction such that getting results from database or pkl file should be easily swappable. ✅ - DONE
+    - Issue ❗- Need to convert chunking strategy into an abstraction and implementable for dataframe, vector DB etc ✅ - DONE
   - Use Hybrid search ✅ - Through weaviate. Abstraction pending
   - Option for attaching Postgres/Elasticsearch(or Solr, Opensearch etc) instance for search.❌
     - Is it possible to do search using SQL? [Levels.fyi did it](https://www.levels.fyi/blog/scalable-search-with-postgres.html)
     - MOST people usually move things to Elasticsearch for keyword search.
     - Hence, if you're using SQL, move data to a search engine(like Solr etc) which can do good hybrid search.
     - I am aware of Elasticsearch basics, will add Elasticsearch integration
+  - ❗Design Flaw Maybe: In the storage class, a lot of if conditions getting created on the basis of index_name(parent, child). Is there a way to unify in 1 single index?  
 - Features 
   - Multiple PDFs (should be easy, just repeat everything for each file)
 - Deployment and Productization 
   - Logging using loggers and NOT print statements.
   - Create APIs for operations
+    - Add document
+    - Search
+    - Remove document?
   - Create Streamlit UI
-  - Create Dockerfile
-  - Deploy somewhere
+  - Storage should be a singleton dependency
+  - Deployment stuff
+    - Docker
+    - K8s
+  - What if multiple users use it? Change database design?
   - Tests :(
 - PI removal 
 - Evaluation using Tru Lens

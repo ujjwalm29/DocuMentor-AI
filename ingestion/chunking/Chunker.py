@@ -13,7 +13,7 @@ class Chunker:
         self.embedding_generator = LocalEmbeddings()
 
         self.child_parent_ratio = 4
-        self.child_text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=0)
+        self.child_text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
 
 
     def create_chunks_from_splits_children(self, splits):
@@ -132,43 +132,5 @@ class Chunker:
     #
     #         if len(final_context) >= 5:
     #             break
-    #
-    #     return final_context
-    #
-    # def sentence_window_retrieval(self, query: str, children_chunks_df: pd.DataFrame, window_size: int):
-    #     df_embeddings = pd.DataFrame(children_chunks_df['embeddings'].tolist())
-    #     similarities = cosine_similarity(self.embedding_generator.get_embedding([query]), df_embeddings).flatten()
-    #
-    #     top_indices = np.argsort(similarities)[::-1][:5]
-    #
-    #     print(top_indices)
-    #
-    #     final_context = []
-    #
-    #     # parse from node to back, node to front using IDs. Make sure to keep track of order.
-    #     for index in top_indices:
-    #         cur_node = children_chunks_df.iloc[index]
-    #
-    #         prev_node = children_chunks_df.loc[cur_node['prev_id']]
-    #         context_before = []
-    #         while len(context_before) < window_size and prev_node.name != self.head_child_chunk.chunk_id:
-    #             context_before.append(prev_node['text'])
-    #             prev_node = children_chunks_df.loc[prev_node['prev_id']]
-    #
-    #         context_before.reverse()
-    #
-    #         next_node = children_chunks_df.loc[cur_node['next_id']]
-    #         context_after = []
-    #         while len(context_after) < window_size and next_node.name != self.tail_child_chunk.chunk_id:
-    #             context_after.append(next_node['text'])
-    #             next_node = children_chunks_df.loc[next_node['next_id']]
-    #
-    #         concat_context = ''.join(context_before) + cur_node.text + ''.join(context_after)
-    #
-    #         final_context.append(concat_context)
-    #
-    #     for context in final_context:
-    #         print()
-    #         print(context)
     #
     #     return final_context
