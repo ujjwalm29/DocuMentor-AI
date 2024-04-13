@@ -10,7 +10,7 @@ import uuid
 class Chunker:
 
     def __init__(self):
-        self.embedding_generator = LocalEmbeddings('not_needed')
+        self.embedding_generator = LocalEmbeddings()
 
         self.child_parent_ratio = 4
         self.child_text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=0)
@@ -32,9 +32,9 @@ class Chunker:
                 continue
 
             new_chunk = ChildChunk(
-                id=new_chunk_id,
+                chunk_id=new_chunk_id,
                 text=split,
-                prev_id=None if prev_chunk is None else prev_chunk.id,
+                prev_id=None if prev_chunk is None else prev_chunk.chunk_id,
                 next_id=None,  # Will be updated later or remains -1 if it's the last chunk
                 embeddings=[], # self.embedding_generator.get_embedding(split),
                 metadata={},
@@ -64,11 +64,11 @@ class Chunker:
                 text += chunk.text
 
             new_parent_chunk = ParentChunk(
-                id=parent_chunk_ID,
+                chunk_id=parent_chunk_ID,
                 text=text,
                 embeddings=[],
                 metadata={},
-                prev_id=None if prev_par_chunk is None else prev_par_chunk.id,
+                prev_id=None if prev_par_chunk is None else prev_par_chunk.chunk_id,
                 next_id=None,
                 number_of_children=len(child_chunks)
             )
@@ -84,6 +84,10 @@ class Chunker:
         assert math.ceil(len(children_chunks_list) / self.child_parent_ratio) == len(parent_chunks)
 
         return children_chunks_list, parent_chunks
+
+
+    def split_text(self, text: str) -> List[str]:
+        return self.child_text_splitter.split_text(text)
 
 
     # def auto_merging_retrieval(self, query: str, children_chunks_df: pd.DataFrame, parent_chunks_df: pd.DataFrame):
@@ -147,7 +151,7 @@ class Chunker:
     #
     #         prev_node = children_chunks_df.loc[cur_node['prev_id']]
     #         context_before = []
-    #         while len(context_before) < window_size and prev_node.name != self.head_child_chunk.id:
+    #         while len(context_before) < window_size and prev_node.name != self.head_child_chunk.chunk_id:
     #             context_before.append(prev_node['text'])
     #             prev_node = children_chunks_df.loc[prev_node['prev_id']]
     #
@@ -155,7 +159,7 @@ class Chunker:
     #
     #         next_node = children_chunks_df.loc[cur_node['next_id']]
     #         context_after = []
-    #         while len(context_after) < window_size and next_node.name != self.tail_child_chunk.id:
+    #         while len(context_after) < window_size and next_node.name != self.tail_child_chunk.chunk_id:
     #             context_after.append(next_node['text'])
     #             next_node = children_chunks_df.loc[next_node['next_id']]
     #

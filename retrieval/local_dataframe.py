@@ -23,4 +23,4 @@ class LocalDataframe:
 
         print(top_indices)
 
-        return self.retrieval_strategy.get_context(top_indices, df)
+        return self.retrieval_strategy.get_context(top_indices)

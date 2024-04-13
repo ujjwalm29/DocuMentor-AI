@@ -6,7 +6,7 @@ from uuid import UUID
 @dataclass
 class ChunkBase:
 
-    id: UUID
+    chunk_id: UUID
     text: str
     prev_id: UUID | None
     next_id: UUID | None
