@@ -2,6 +2,9 @@ from ingestion.storage.weaviate import Weaviate
 from ingestion.storage.storage import Storage
 from retrieval.base_retrieval import Retrieval
 from constants import CHILD_CHUNKS_INDEX_NAME
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SentenceWindowRetrieval(Retrieval):
@@ -15,6 +18,7 @@ class SentenceWindowRetrieval(Retrieval):
         self.storage = storage
 
     def get_context(self, top_results):
+        logger.debug(f"Sentence Window Retrieval get_context called with top_results ${top_results}")
         top_results = top_results[:5]
         final_results = []
 
@@ -39,5 +43,7 @@ class SentenceWindowRetrieval(Retrieval):
 
             # Put in results
             final_results.append(''.join(context))
+
+        self.storage.close_connection()  # To be removed when DB object is made singleton
 
         return final_results

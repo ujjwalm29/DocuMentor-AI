@@ -1,12 +1,11 @@
 from typing import List
 
-import pandas as pd
+import logging
 from sentence_transformers import SentenceTransformer
-import os
 from embeddings.Embeddings import Embeddings
 from ingestion.chunking.Chunk import ChunkBase
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+logger = logging.getLogger(__name__)
 
 
 class LocalEmbeddings(Embeddings):
@@ -15,6 +14,7 @@ class LocalEmbeddings(Embeddings):
         self,
         embeddings_model: str = "mixedbread-ai/mxbai-embed-2d-large-v1",
     ):
+        logger.debug(f"Local HF Embeddings initialized. Model name = {embeddings_model}")
         self.model = SentenceTransformer(embeddings_model)
 
 

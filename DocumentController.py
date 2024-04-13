@@ -1,3 +1,5 @@
+import logging
+
 from embeddings.Embeddings import Embeddings
 from embeddings.LocalHFEmbeddings import LocalEmbeddings
 from ingestion.chunking.Chunk import ChildChunk, ParentChunk
@@ -22,7 +24,7 @@ class DocumentController:
     def __init__(self, splitter: TextSplitter = RecursiveTextSplitter(),
                  embedding: Embeddings = LocalEmbeddings(),
                  storage: Storage = Weaviate(),
-                 retrieval: Retrieval = AutoMergeRetrieval()):
+                 retrieval: Retrieval = SentenceWindowRetrieval()):
         self.splitter = splitter
         self.embedding = embedding
         self.storage = storage
@@ -30,8 +32,8 @@ class DocumentController:
 
 
     def process_text_and_store(self, text: str):
+        logging.debug(f"Starting text chunking and store")
         chunker = Chunker()
-
 
         self.storage.delete_index(CHILD_CHUNKS_INDEX_NAME)
         self.storage.delete_index(PARENTS_CHUNK_INDEX_NAME)
@@ -52,11 +54,12 @@ class DocumentController:
 
 
     def search_and_retrieve_result(self, query: str):
+        logging.debug(f"Starting search and retrieve")
 
         vector = self.embedding.get_embedding(query)
         results = self.storage.hybrid_search(index_name=CHILD_CHUNKS_INDEX_NAME, query_vector=vector, query_str=query)
         final_context = self.retrieval.get_context(results)
-        print(final_context)
+        logging.debug(f"Final context retrieved : f{final_context}")
 
         self.storage.close_connection()
 

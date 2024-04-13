@@ -1,6 +1,7 @@
 import os
 from typing import List, Dict
 from uuid import uuid4, UUID
+import logging
 
 import weaviate
 from ingestion.storage.storage import Storage
@@ -10,6 +11,7 @@ from ingestion.chunking.Chunk import ChildChunk, ParentChunk
 from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME
 from dataclasses import asdict, is_dataclass
 
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -26,10 +28,13 @@ class Weaviate(Storage):
 
     def __init__(self):
         super().__init__()
+        logger.info("Initializing connection to weaviate database")
         self.client = weaviate.connect_to_local(host=os.getenv("WEAVIATE_HOST"), port=int(os.getenv("WEAVIATE_PORT")))
 
 
     def create_new_index(self, index_name: str, index_properties: Dict):
+        logger.info(f"Create new index with name {index_name}")
+        logger.debug(f"Index properties {index_properties}")
         properties = list()
         for field_name, field_type in index_properties.items():
             if field_name == "embeddings":
@@ -42,14 +47,14 @@ class Weaviate(Storage):
             properties.append(new_prop)
 
         self.client.collections.create(index_name, properties=properties)
-        print(f"{index_name} created!")
+        logger.info(f"{index_name} created!")
 
 
     def create_new_index_if_not_exists(self, index_name: str, index_properties: Dict):
         if not self.client.collections.exists(index_name):
             self.create_new_index(index_name, index_properties)
         else:
-            print(f"{index_name} already exists")
+            logger.info(f"{index_name} already exists")
 
     def get_index_size(self, index_name: str = CHILD_CHUNKS_INDEX_NAME):
         data = self.client.collections.get(index_name)
@@ -59,6 +64,8 @@ class Weaviate(Storage):
         return count
 
     def add_data_to_index(self, index_name: str, data: List):
+        logger.info(f"Adding data to index {index_name}")
+        logger.debug(f"Data {data}")
         collection = self.client.collections.get(index_name.lower())
 
         with collection.batch.dynamic() as batch:
@@ -84,15 +91,18 @@ class Weaviate(Storage):
 
 
     def delete_index(self, index_name: str):
+        logger.warning(f"delete_index called for Index {index_name}")
         if self.client.collections.exists(index_name):
             self.client.collections.delete(index_name)
 
     def get_element_by_chunk_id(self, index_name: str, element_id: uuid4) -> ChildChunk:
+        logger.debug(f"get_element_by_chunk_id called for ID {element_id} Index {index_name}")
         element = self.client.collections.get(index_name).query.fetch_object_by_id(str(element_id))
 
         return self.create_chunk_from_weaviate_objects(index_name, element)
 
     def vector_search(self, index_name: str, query_vector, number_of_results: int = 20):
+        logger.debug(f"vector search Index {index_name}")
         response = self.client.collections.get(index_name).query.near_vector(
             near_vector=query_vector.tolist(),
             limit=number_of_results
@@ -108,6 +118,7 @@ class Weaviate(Storage):
         return response_chunks
 
     def hybrid_search(self, index_name: str, query_vector, query_str: str, number_of_results: int = 20, query_properties: List[str]="text"):
+        logger.debug(f"hybrid search Index {index_name}, Query {query_str}, Query Properties {query_properties}")
         response = self.client.collections.get(index_name).query.hybrid(
             query=query_str,
             query_properties=[query_properties],
@@ -123,6 +134,7 @@ class Weaviate(Storage):
         return response_chunks
 
     def close_connection(self):
+        logger.info("Closing weaviate client connection")
         self.client.close()
 
 

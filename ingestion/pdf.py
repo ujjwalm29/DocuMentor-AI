@@ -5,8 +5,10 @@ from ingestion.splitters.text_splitter import TextSplitter
 import pandas as pd
 
 import os
+import logging
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 
 
@@ -22,6 +24,7 @@ class PdfParser:
         self.parsing_instructs = parsing_instructs
 
     def get_text_from_pdf(self, ):
+        logger.debug(f"Starting LlamaParse job.. Result Type :${self.result_type}")
         parser = LlamaParse(
             api_key=os.getenv("LLAMA_PDF_API_KEY"),
             parsing_instruction=self.parsing_instructs

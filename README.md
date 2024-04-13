@@ -79,11 +79,14 @@ Q&A for pdfs.
     - MOST people usually move things to Elasticsearch for keyword search.
     - Hence, if you're using SQL, move data to a search engine(like Solr etc) which can do good hybrid search.
     - I am aware of Elasticsearch basics, will add Elasticsearch integration
-  - ❗Design Flaw Maybe: In the storage class, a lot of if conditions getting created on the basis of index_name(parent, child). Is there a way to unify in 1 single index?  
+  - Design Flaw Maybe: In the storage class, a lot of if conditions getting created on the basis of index_name(parent, child). Is there a way to unify in 1 single index? ✅
+    - The child chunk and parent chunk classes have been unified in the branch `schema_change`. But there are a few issues :
+      - If you put everything into 1 index, then parent chunks become part of the search. This is unnecessary and will affect performance.
+      - An option would be to add a Filter on the chunks with 0 children and then do a search. That would add unnecessary overhead as well.
 - Features 
   - Multiple PDFs (should be easy, just repeat everything for each file)
 - Deployment and Productization 
-  - Logging using loggers and NOT print statements.
+  - Logging using loggers and NOT print statements. ✅ - `INFO`, `DEBUG` and `WARN` logging added 
   - Create APIs for operations
     - Add document
     - Search
