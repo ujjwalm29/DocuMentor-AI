@@ -4,7 +4,7 @@ from uuid import UUID
 
 
 @dataclass
-class ChunkBase:
+class Chunk:
 
     chunk_id: UUID
     text: str
@@ -12,15 +12,5 @@ class ChunkBase:
     next_id: UUID | None
     embeddings: List[float]
     metadata: object
-
-
-@dataclass
-class ParentChunk(ChunkBase):
-
     number_of_children: int
-
-
-@dataclass
-class ChildChunk(ChunkBase):
-
     parent_id: UUID | None

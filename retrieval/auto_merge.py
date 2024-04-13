@@ -1,11 +1,10 @@
 from collections import Counter
 from typing import List
 
-from ingestion.chunking.Chunk import ChildChunk
+from ingestion.chunking.Chunk import Chunk
 from ingestion.storage.storage import Storage
 from ingestion.storage.weaviate import Weaviate
 from retrieval.base_retrieval import Retrieval
-from constants import PARENTS_CHUNK_INDEX_NAME
 
 
 class AutoMergeRetrieval(Retrieval):
@@ -13,7 +12,7 @@ class AutoMergeRetrieval(Retrieval):
     def __init__(self, storage: Storage = Weaviate()):
         self.storage = storage
 
-    def get_context(self, top_results: List[ChildChunk]):
+    def get_context(self, top_results: List[Chunk]):
 
         # Get all parent Ids
         parent_ids = [result.parent_id for result in top_results]
@@ -33,7 +32,7 @@ class AutoMergeRetrieval(Retrieval):
                 continue
 
             if parent_count_map.get(chunk.parent_id) > 2:
-                parent_chunk = self.storage.get_element_by_chunk_id(index_name=PARENTS_CHUNK_INDEX_NAME,element_id=chunk.parent_id)
+                parent_chunk = self.storage.get_element_by_chunk_id(element_id=chunk.parent_id)
 
                 final_context.append(parent_chunk.text)
 

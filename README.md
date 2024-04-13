@@ -79,7 +79,7 @@ Q&A for pdfs.
     - MOST people usually move things to Elasticsearch for keyword search.
     - Hence, if you're using SQL, move data to a search engine(like Solr etc) which can do good hybrid search.
     - I am aware of Elasticsearch basics, will add Elasticsearch integration
-  - ❗Design Flaw Maybe: In the storage class, a lot of if conditions getting created on the basis of index_name(parent, child). Is there a way to unify in 1 single index?  
+  - ❗Design Flaw Maybe: In the storage class, a lot of if conditions getting created on the basis of index_name(parent, child). Is there a way to unify in 1 single index? ✅ - Fixed. Unified.
 - Features 
   - Multiple PDFs (should be easy, just repeat everything for each file)
 - Deployment and Productization 

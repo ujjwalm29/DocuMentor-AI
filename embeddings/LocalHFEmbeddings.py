@@ -4,7 +4,7 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 import os
 from embeddings.Embeddings import Embeddings
-from ingestion.chunking.Chunk import ChunkBase
+from ingestion.chunking.Chunk import Chunk
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -18,7 +18,7 @@ class LocalEmbeddings(Embeddings):
         self.model = SentenceTransformer(embeddings_model)
 
 
-    def get_embeddings_for_chunks(self, chunks: List[ChunkBase]):
+    def get_embeddings_for_chunks(self, chunks: List[Chunk]):
         texts = [obj.text for obj in chunks]
 
         embeddings = self.model.encode(texts, batch_size=32)

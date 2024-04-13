@@ -1,7 +1,6 @@
 from ingestion.storage.weaviate import Weaviate
 from ingestion.storage.storage import Storage
 from retrieval.base_retrieval import Retrieval
-from constants import CHILD_CHUNKS_INDEX_NAME
 
 
 class SentenceWindowRetrieval(Retrieval):
@@ -25,7 +24,7 @@ class SentenceWindowRetrieval(Retrieval):
             for i in range(0, self.adjacent_neighbor_window_size):
                 if chunk.prev_id is None:
                     break
-                prev_chunk = self.storage.get_element_by_chunk_id(CHILD_CHUNKS_INDEX_NAME, chunk.prev_id)
+                prev_chunk = self.storage.get_element_by_chunk_id(chunk.prev_id)
                 context.append(prev_chunk.text)
 
             context.reverse()
@@ -34,7 +33,7 @@ class SentenceWindowRetrieval(Retrieval):
             for i in range(0, self.adjacent_neighbor_window_size):
                 if chunk.next_id is None:
                     break
-                next_chunk = self.storage.get_element_by_chunk_id(CHILD_CHUNKS_INDEX_NAME, chunk.next_id)
+                next_chunk = self.storage.get_element_by_chunk_id(chunk.next_id)
                 context.append(next_chunk.text)
 
             # Put in results

@@ -23,7 +23,7 @@ Convert tables into a list of facts. Do not include "Research Paper" in the fina
 query = "What is N, R and W?"
 
 controller = DocumentController()
-# controller.process_text_and_store(pdf_parser.get_text_from_pdf())
+controller.process_text_and_store(pdf_parser.get_text_from_pdf())
 context = controller.search_and_retrieve_result(query)
 
 generate = ChatOpenAI()

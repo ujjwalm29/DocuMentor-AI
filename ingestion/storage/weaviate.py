@@ -6,8 +6,8 @@ import weaviate
 from ingestion.storage.storage import Storage
 from dotenv import load_dotenv
 from weaviate.classes.config import Property, DataType
-from ingestion.chunking.Chunk import ChildChunk, ParentChunk
-from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME
+from ingestion.chunking.Chunk import Chunk
+from constants import CHUNKS_INDEX_NAME
 from dataclasses import asdict, is_dataclass
 
 
@@ -51,7 +51,7 @@ class Weaviate(Storage):
         else:
             print(f"{index_name} already exists")
 
-    def get_index_size(self, index_name: str = CHILD_CHUNKS_INDEX_NAME):
+    def get_index_size(self, index_name: str = CHUNKS_INDEX_NAME):
         data = self.client.collections.get(index_name)
 
         count = sum(1 for _ in data.iterator())
@@ -70,27 +70,22 @@ class Weaviate(Storage):
                     property_value = {
                         "text": props['text'],
                         "prev_id": props['prev_id'],
-                        "next_id": props['next_id']
+                        "next_id": props['next_id'],
+                        "parent_id": props['parent_id'],
+                        "number_of_children": props["number_of_children"]
                     }
 
-                    if index_name.lower() == CHILD_CHUNKS_INDEX_NAME:
-                        property_value['parent_id'] = props['parent_id']
-                    else:
-                        property_value['number_of_children'] = props['number_of_children']
-
                     batch.add_object(properties=property_value, vector=obj_vector, uuid=props['chunk_id'])
-
-
 
 
     def delete_index(self, index_name: str):
         if self.client.collections.exists(index_name):
             self.client.collections.delete(index_name)
 
-    def get_element_by_chunk_id(self, index_name: str, element_id: uuid4) -> ChildChunk:
+    def get_element_by_chunk_id(self, element_id: uuid4, index_name: str = CHUNKS_INDEX_NAME) -> Chunk:
         element = self.client.collections.get(index_name).query.fetch_object_by_id(str(element_id))
 
-        return self.create_chunk_from_weaviate_objects(index_name, element)
+        return self.create_chunk_from_weaviate_objects(element)
 
     def vector_search(self, index_name: str, query_vector, number_of_results: int = 20):
         response = self.client.collections.get(index_name).query.near_vector(
@@ -103,7 +98,7 @@ class Weaviate(Storage):
         response_chunks = []
 
         for obj in response.objects:
-            response_chunks.append(self.create_chunk_from_weaviate_objects(index_name, obj))
+            response_chunks.append(self.create_chunk_from_weaviate_objects(obj))
 
         return response_chunks
 
@@ -118,7 +113,7 @@ class Weaviate(Storage):
         response_chunks = []
 
         for obj in response.objects:
-            response_chunks.append(self.create_chunk_from_weaviate_objects(index_name, obj))
+            response_chunks.append(self.create_chunk_from_weaviate_objects(obj))
 
         return response_chunks
 
@@ -126,24 +121,14 @@ class Weaviate(Storage):
         self.client.close()
 
 
-    def create_chunk_from_weaviate_objects(self, index_name, obj):
-        if index_name == CHILD_CHUNKS_INDEX_NAME:
-            return ChildChunk(
-                chunk_id=obj.uuid,
-                parent_id=obj.properties['parent_id'],
-                next_id=obj.properties['next_id'],
-                prev_id=obj.properties['prev_id'],
-                text=obj.properties['text'],
-                embeddings=[],
-                metadata={}
-            )
-        else:
-            return ParentChunk(
-                chunk_id=obj.uuid,
-                number_of_children=obj.properties['number_of_children'],
-                next_id=obj.properties['next_id'],
-                prev_id=obj.properties['prev_id'],
-                text=obj.properties['text'],
-                embeddings=[],
-                metadata={}
-            )
+    def create_chunk_from_weaviate_objects(self, obj):
+        return Chunk(
+            chunk_id=obj.uuid,
+            parent_id=obj.properties['parent_id'],
+            next_id=obj.properties['next_id'],
+            prev_id=obj.properties['prev_id'],
+            text=obj.properties['text'],
+            number_of_children=obj.properties['number_of_children'],
+            embeddings=[],
+            metadata={}
+        )
