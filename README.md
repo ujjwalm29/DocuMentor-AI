@@ -82,7 +82,8 @@ Q&A for pdfs.
 - Features 
   - Multiple PDFs (should be easy, just repeat everything for each file)
 - Deployment and Productization 
-  - Logging using loggers and NOT print statements lol.
+  - Logging using loggers and NOT print statements.
+  - Create APIs for operations
   - Create Streamlit UI
   - Create Dockerfile
   - Deploy somewhere
