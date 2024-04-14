@@ -48,8 +48,6 @@ class AutoMergeRetrieval(Retrieval):
             if len(final_context) >= 5:
                 break
 
-        self.storage.close_connection()  # To be removed when DB object is made singleton
-
         return final_context
 
 

@@ -23,6 +23,7 @@ class Chunker:
         chunks_data = []
 
         for split in splits:
+            split = split.replace("\n", "")
             new_chunk_id = uuid.uuid4()  # Generate a new unique ID
 
             if prev_chunk is not None:
@@ -89,48 +90,3 @@ class Chunker:
     def split_text(self, text: str) -> List[str]:
         return self.child_text_splitter.split_text(text)
 
-
-    # def auto_merging_retrieval(self, query: str, children_chunks_df: pd.DataFrame, parent_chunks_df: pd.DataFrame):
-    #     df_embeddings = pd.DataFrame(children_chunks_df['embeddings'].tolist())
-    #     similarities = cosine_similarity(self.embedding_generator.get_embedding([query]), df_embeddings).flatten()
-    #
-    #     top_indices = np.argsort(similarities)[::-1][:30]
-    #
-    #     # Now, it's time to merge
-    #     # Get a map Of parent IDs, count_of_children
-    #     # Get the integer position of the 'parent_id' column
-    #     parent_id_col_pos = children_chunks_df.columns.get_loc('parent_id')
-    #
-    #     # Use .iloc with top_indices and the column position to access 'parent_id' values
-    #     parent_ids = children_chunks_df.iloc[top_indices, parent_id_col_pos]
-    #
-    #     # Use Counter to count the frequency of each parent_id
-    #     parent_count_map = Counter(parent_ids)
-    #
-    #     print(parent_count_map)
-    #
-    #     # In final results, sort by top 5. If parent has count>2, don't add child, add parent
-    #     # Store info so parent or any child of parent don't get added to the top 5.
-    #     top_indices = top_indices[:10]
-    #
-    #     used_parent = set()
-    #
-    #     final_context = []
-    #
-    #     for index in top_indices:
-    #         parent_id = children_chunks_df.iloc[index]['parent_id']
-    #
-    #         if parent_id in used_parent:
-    #             continue
-    #
-    #         if parent_count_map[parent_id] > 2:
-    #             print("Putting parent..")
-    #             final_context.append(parent_chunks_df.loc[parent_id, 'text'])
-    #             used_parent.add(parent_id)
-    #         else:
-    #             final_context.append(children_chunks_df.iloc[index]['text'])
-    #
-    #         if len(final_context) >= 5:
-    #             break
-    #
-    #     return final_context

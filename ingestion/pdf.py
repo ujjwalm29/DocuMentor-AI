@@ -1,8 +1,5 @@
 from llama_parse import LlamaParse, ResultType
 from dotenv import load_dotenv
-from ingestion.splitters.naive_text_splitter import NaiveTextSplitter
-from ingestion.splitters.text_splitter import TextSplitter
-import pandas as pd
 
 import os
 import logging
@@ -17,12 +14,11 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class PdfParser:
 
-    def __init__(self, result_type: str = 'md', text_splitter: TextSplitter = NaiveTextSplitter(), parsing_instructs: str = ""):
-        self.text_splitter = text_splitter
+    def __init__(self, result_type: str = 'md', parsing_instructs: str = ""):
         self.result_type = result_type
         self.parsing_instructs = parsing_instructs
 
-    def get_text_from_pdf(self, file_path: str):
+    async def get_text_from_pdf(self, file_path: str):
         logger.debug(f"Starting LlamaParse job.. Result Type :${self.result_type}")
         parser = LlamaParse(
             api_key=os.getenv("LLAMA_PDF_API_KEY"),
@@ -41,7 +37,7 @@ class PdfParser:
         parsed_file_path = os.path.join(PROJECT_ROOT, 'data', 'markdowns', new_file_name)
 
         if not os.path.exists(parsed_file_path):
-            documents = parser.load_data(file_path)
+            documents = await parser.aload_data(file_path)
 
             with open(parsed_file_path, "w") as file:
                 file.write(documents[0].text)
@@ -53,8 +49,3 @@ class PdfParser:
                 document = file.read()
 
             return document
-
-    def parse_pdf(self):
-        document = self.get_text_from_pdf()
-        sentences = self.text_splitter.split_text(document)
-        return pd.DataFrame(sentences, columns=['sentence'])

@@ -12,3 +12,4 @@ anthropic
 weaviate-client
 fastapi
 uvicorn
+python-multipart

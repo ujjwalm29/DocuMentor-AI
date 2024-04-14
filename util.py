@@ -5,7 +5,7 @@ import logging
 def setup_logging():
     # Set up basic configuration for the logging system
     logging.basicConfig(
-        level=logging.WARN,
+        level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )

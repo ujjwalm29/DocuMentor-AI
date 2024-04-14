@@ -25,11 +25,12 @@ class DocumentController:
     def __init__(self, splitter: TextSplitter = RecursiveTextSplitter(),
                  embedding: Embeddings = LocalEmbeddings(),
                  storage: Storage = Weaviate(),
-                 retrieval: Retrieval = SentenceWindowRetrieval(),
+                 retrieval: Retrieval = SentenceWindowRetrieval(adjacent_neighbor_window_size=1),
                  pdf_parser: PdfParser = PdfParser(parsing_instructs="""
 You are parsing a research paper. DO NOT parse or include the references section or any metadata or acknowledgments in the output.
 Convert tables into a list of facts. Do not include "Research Paper" in the final md file.
-""", text_splitter=RecursiveTextSplitter(chunk_size=300))):
+""")):
+        logging.info("Init Doc Controller")
         self.splitter = splitter
         self.embedding = embedding
         self.storage = storage
@@ -37,21 +38,16 @@ Convert tables into a list of facts. Do not include "Research Paper" in the fina
         self.pdf_parser = pdf_parser
 
 
-    def process_text_and_store(self, file_path: str):
+    async def process_text_and_store(self, file_path: str):
         logging.debug(f"Starting document parsing, text chunking and store")
 
-        text = self.pdf_parser.get_text_from_pdf(file_path)
+        text = await self.pdf_parser.get_text_from_pdf(file_path)
 
         chunker = Chunker()
 
-        self.storage.delete_index(CHILD_CHUNKS_INDEX_NAME)
-        self.storage.delete_index(PARENTS_CHUNK_INDEX_NAME)
+        # self.delete_indexes()
 
-        child_data_dict = get_dataclass_fields(ChildChunk)
-        self.storage.create_new_index_if_not_exists(CHILD_CHUNKS_INDEX_NAME, child_data_dict)
-
-        parent_data_dict = get_dataclass_fields(ParentChunk)
-        self.storage.create_new_index_if_not_exists(PARENTS_CHUNK_INDEX_NAME, parent_data_dict)
+        self.create_indexes_if_not_exist()
 
         children_chunks = chunker.create_chunks_from_splits_children(chunker.split_text(text))
         children_chunks, parent_chunks = chunker.create_parent_chunks_using_child_chunks(children_chunks)
@@ -70,7 +66,17 @@ Convert tables into a list of facts. Do not include "Research Paper" in the fina
         final_context = self.retrieval.get_context(results)
         logging.debug(f"Final context retrieved : f{final_context}")
 
-        self.storage.close_connection()
-
         return final_context
 
+
+    def delete_indexes(self):
+        self.storage.delete_index(CHILD_CHUNKS_INDEX_NAME)
+        self.storage.delete_index(PARENTS_CHUNK_INDEX_NAME)
+
+
+    def create_indexes_if_not_exist(self):
+        child_data_dict = get_dataclass_fields(ChildChunk)
+        self.storage.create_new_index_if_not_exists(CHILD_CHUNKS_INDEX_NAME, child_data_dict)
+
+        parent_data_dict = get_dataclass_fields(ParentChunk)
+        self.storage.create_new_index_if_not_exists(PARENTS_CHUNK_INDEX_NAME, parent_data_dict)

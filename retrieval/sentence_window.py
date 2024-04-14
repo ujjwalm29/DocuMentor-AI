@@ -44,6 +44,4 @@ class SentenceWindowRetrieval(Retrieval):
             # Put in results
             final_results.append(''.join(context))
 
-        self.storage.close_connection()  # To be removed when DB object is made singleton
-
         return final_results
