@@ -91,6 +91,8 @@ Q&A for pdfs.
     - Add document
     - Search
     - Remove document?
+      - How to design this?
+      - Each doc indexed needs to have an ID. Each chunk needs a doc ID. Enter doc ID to delete.
   - Create Streamlit UI
   - Storage should be a singleton dependency
   - Deployment stuff

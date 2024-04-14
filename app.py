@@ -17,16 +17,11 @@ file_path = 'data/pdf/amazon-dynamo-sosp2007.pdf'
 pkl_file_name = ''.join(file_path.split('/')[-1].split('.')[:-1]) + '.pkl'
 pkl_file_path = os.path.join('data', 'pkl', pkl_file_name)
 
-pdf_parser = PdfParser(file_path=file_path, parsing_instructs="""
-You are parsing a research paper. DO NOT parse or include the references section or any metadata or acknowledgments in the output.
-Convert tables into a list of facts. Do not include "Research Paper" in the final md file.
-""", text_splitter=RecursiveTextSplitter(chunk_size=300))
-
 
 query = "What is N, R and W?"
 
 controller = DocumentController()
-controller.process_text_and_store(pdf_parser.get_text_from_pdf())
+controller.process_text_and_store(file_path=file_path)
 context = controller.search_and_retrieve_result(query)
 
 generate = ChatOpenAI()

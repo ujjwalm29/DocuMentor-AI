@@ -3,6 +3,7 @@ import logging
 from embeddings.Embeddings import Embeddings
 from embeddings.LocalHFEmbeddings import LocalEmbeddings
 from ingestion.chunking.Chunk import ChildChunk, ParentChunk
+from ingestion.pdf import PdfParser
 from ingestion.splitters.text_splitter import TextSplitter
 from ingestion.splitters.recursive_splitter import RecursiveTextSplitter
 from ingestion.storage.storage import Storage
@@ -24,15 +25,23 @@ class DocumentController:
     def __init__(self, splitter: TextSplitter = RecursiveTextSplitter(),
                  embedding: Embeddings = LocalEmbeddings(),
                  storage: Storage = Weaviate(),
-                 retrieval: Retrieval = SentenceWindowRetrieval()):
+                 retrieval: Retrieval = SentenceWindowRetrieval(),
+                 pdf_parser: PdfParser = PdfParser(parsing_instructs="""
+You are parsing a research paper. DO NOT parse or include the references section or any metadata or acknowledgments in the output.
+Convert tables into a list of facts. Do not include "Research Paper" in the final md file.
+""", text_splitter=RecursiveTextSplitter(chunk_size=300))):
         self.splitter = splitter
         self.embedding = embedding
         self.storage = storage
         self.retrieval = retrieval
+        self.pdf_parser = pdf_parser
 
 
-    def process_text_and_store(self, text: str):
-        logging.debug(f"Starting text chunking and store")
+    def process_text_and_store(self, file_path: str):
+        logging.debug(f"Starting document parsing, text chunking and store")
+
+        text = self.pdf_parser.get_text_from_pdf(file_path)
+
         chunker = Chunker()
 
         self.storage.delete_index(CHILD_CHUNKS_INDEX_NAME)

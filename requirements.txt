@@ -10,3 +10,5 @@ scikit-learn
 openai
 anthropic
 weaviate-client
+fastapi
+uvicorn

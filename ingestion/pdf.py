@@ -17,13 +17,12 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class PdfParser:
 
-    def __init__(self, file_path: str, result_type: str = 'md', text_splitter: TextSplitter = NaiveTextSplitter(), parsing_instructs: str = ""):
-        self.file_path = file_path
+    def __init__(self, result_type: str = 'md', text_splitter: TextSplitter = NaiveTextSplitter(), parsing_instructs: str = ""):
         self.text_splitter = text_splitter
         self.result_type = result_type
         self.parsing_instructs = parsing_instructs
 
-    def get_text_from_pdf(self, ):
+    def get_text_from_pdf(self, file_path: str):
         logger.debug(f"Starting LlamaParse job.. Result Type :${self.result_type}")
         parser = LlamaParse(
             api_key=os.getenv("LLAMA_PDF_API_KEY"),
@@ -36,13 +35,13 @@ class PdfParser:
         else:
             raise NotImplementedError
 
-        new_file_name = ''.join(self.file_path.split('/')[-1].split('.')[:-1]) + '.' + self.result_type.lower()
+        new_file_name = ''.join(file_path.split('/')[-1].split('.')[:-1]) + '.' + self.result_type.lower()
 
         # check if PROJECT_ROOT/markdowns/{file}.{extension} exists
         parsed_file_path = os.path.join(PROJECT_ROOT, 'data', 'markdowns', new_file_name)
 
         if not os.path.exists(parsed_file_path):
-            documents = parser.load_data(self.file_path)
+            documents = parser.load_data(file_path)
 
             with open(parsed_file_path, "w") as file:
                 file.write(documents[0].text)
