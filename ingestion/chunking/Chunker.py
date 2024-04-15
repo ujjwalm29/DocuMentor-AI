@@ -16,7 +16,7 @@ class Chunker:
         self.child_text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
 
 
-    def create_chunks_from_splits_children(self, splits):
+    def create_chunks_from_splits_children(self, doc_id: uuid.UUID, user_id: uuid.UUID, splits):
         prev_chunk = None
 
         # Initialize an empty list to hold the chunk data
@@ -39,7 +39,9 @@ class Chunker:
                 next_id=None,  # Will be updated later or remains -1 if it's the last chunk
                 embeddings=[], # self.embedding_generator.get_embedding(split),
                 metadata={},
-                parent_id=None
+                parent_id=None,
+                user_id=user_id,
+                document_id=doc_id
             )
             chunks_data.append(new_chunk)  # Add the new chunk to the list
             prev_chunk = new_chunk  # Update prev_chunk for the next iteration
@@ -48,7 +50,7 @@ class Chunker:
 
         return chunks_data
 
-    def create_parent_chunks_using_child_chunks(self, children_chunks_list: List[ChildChunk]):
+    def create_parent_chunks_using_child_chunks(self, doc_id: uuid.UUID, user_id: uuid.UUID, children_chunks_list: List[ChildChunk]):
 
         prev_par_chunk = None
         parent_chunks = []
@@ -71,7 +73,9 @@ class Chunker:
                 metadata={},
                 prev_id=None if prev_par_chunk is None else prev_par_chunk.chunk_id,
                 next_id=None,
-                number_of_children=len(child_chunks)
+                number_of_children=len(child_chunks),
+                user_id=user_id,
+                document_id=doc_id
             )
 
             # If you need to replace the original list elements with modified ones:

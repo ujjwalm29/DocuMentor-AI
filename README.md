@@ -84,7 +84,7 @@ Q&A for pdfs.
       - If you put everything into 1 index, then parent chunks become part of the search. This is unnecessary and will affect performance.
       - An option would be to add a Filter on the chunks with 0 children and then do a search. That would add unnecessary overhead as well.
 - Features 
-  - Multiple PDFs (should be easy, just repeat everything for each file)
+  - Multiple PDFs (should be easy, just repeat everything for each file) ✅ - Call the API/function
 - Deployment and Productization 
   - Logging using loggers and NOT print statements. ✅ - `INFO`, `DEBUG` and `WARN` logging added 
   - Create APIs for operations
@@ -94,14 +94,14 @@ Q&A for pdfs.
     - Add auth
       - Added hacky API key based auth - ✅
     - Remove document?
-      - How to design this?
-      - Each doc indexed needs to have an ID. Each chunk needs a doc ID. Enter doc ID to delete.
+      - Each doc indexed needs to have an ID. Each chunk needs a doc ID. Enter doc ID to delete - ✅
   - Create Streamlit UI
   - Storage should be a singleton dependency
   - Deployment stuff
     - Docker
     - docker compose
-  - What if multiple users use it? Change database design?
+  - What if multiple users use it?
+    - Added user_id to the schema - ✅
   - Tests :(
 - PI removal 
 - Evaluation using Tru Lens
