@@ -88,8 +88,11 @@ Q&A for pdfs.
 - Deployment and Productization 
   - Logging using loggers and NOT print statements. ✅ - `INFO`, `DEBUG` and `WARN` logging added 
   - Create APIs for operations
-    - Add document
-    - Search
+    - Add document - ✅
+    - Search - ✅
+    - Delete Indexes - ✅
+    - Add auth
+      - Added hacky API key based auth - ✅
     - Remove document?
       - How to design this?
       - Each doc indexed needs to have an ID. Each chunk needs a doc ID. Enter doc ID to delete.
@@ -97,7 +100,7 @@ Q&A for pdfs.
   - Storage should be a singleton dependency
   - Deployment stuff
     - Docker
-    - K8s
+    - docker compose
   - What if multiple users use it? Change database design?
   - Tests :(
 - PI removal 

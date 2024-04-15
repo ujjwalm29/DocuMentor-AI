@@ -20,13 +20,12 @@ generate = ChatOpenAI()
 
 
 logger.info("Starting...")
-# file_path = 'data/pdf/amazon-dynamo-sosp2007.pdf'
-# pkl_file_name = ''.join(file_path.split('/')[-1].split('.')[:-1]) + '.pkl'
-# pkl_file_path = os.path.join('data', 'pkl', pkl_file_name)
 
 
 @app.post("/upload-pdf/")
-async def upload_pdf_file(file: UploadFile):
+async def upload_pdf_file(key: str, file: UploadFile):
+    if os.getenv("USAGE_KEY") != key:
+        return status.HTTP_401_UNAUTHORIZED
     if file.content_type != 'application/pdf':
         raise HTTPException(status_code=400, detail="Invalid file type. Only PDF files are accepted.")
 
@@ -45,7 +44,9 @@ async def upload_pdf_file(file: UploadFile):
 
 
 @app.delete("/indexes")
-async def delete_index():
+async def delete_index(key: str):
+    if os.getenv("DELETE_KEY") != key:
+        return status.HTTP_401_UNAUTHORIZED
     controller.delete_indexes()
     return status.HTTP_202_ACCEPTED
 
@@ -55,7 +56,9 @@ class Question(BaseModel):
 
 
 @app.post("/question")
-async def question_answer(body: Question):
+async def question_answer(key: str, body: Question):
+    if os.getenv("USAGE_KEY") != key:
+        return status.HTTP_401_UNAUTHORIZED
     context = controller.search_and_retrieve_result(body.question)
 
     answer = generate.get_message(body.question, context, model="gpt-4-turbo")
@@ -63,8 +66,6 @@ async def question_answer(body: Question):
 
     return {"answer": answer}
 
-
-# query = "What is N, R and W?"
 
 
 if __name__ == "__main__":
