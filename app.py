@@ -4,7 +4,7 @@ from DocumentController import DocumentController
 from generation.openai_chat import ChatOpenAI
 from util import setup_logging
 
-from fastapi import FastAPI, UploadFile, HTTPException, status
+from fastapi import FastAPI, UploadFile, HTTPException, status, Response
 import uvicorn
 import logging
 import os
@@ -22,10 +22,10 @@ generate = ChatOpenAI()
 logger.info("Starting...")
 
 
-@app.post("/upload-pdf/")
+@app.post("/upload-pdf")
 async def upload_pdf_file(key: str, file: UploadFile):
     if os.getenv("USAGE_KEY") != key:
-        return status.HTTP_401_UNAUTHORIZED
+        raise HTTPException(status_code=401, detail="Unauthorized access")
     if file.content_type != 'application/pdf':
         raise HTTPException(status_code=400, detail="Invalid file type. Only PDF files are accepted.")
 
@@ -45,10 +45,10 @@ async def upload_pdf_file(key: str, file: UploadFile):
 
 @app.delete("/indexes")
 async def delete_index(key: str):
-    if os.getenv("DELETE_KEY") != key:
-        return status.HTTP_401_UNAUTHORIZED
+    if os.getenv("DELETE_INDEX_KEY") != key:
+        raise HTTPException(status_code=401, detail="Unauthorized access")
     controller.delete_indexes()
-    return status.HTTP_202_ACCEPTED
+    return Response(status_code=202)
 
 
 class Question(BaseModel):
@@ -58,7 +58,7 @@ class Question(BaseModel):
 @app.post("/question")
 async def question_answer(key: str, body: Question):
     if os.getenv("USAGE_KEY") != key:
-        return status.HTTP_401_UNAUTHORIZED
+        raise HTTPException(status_code=401, detail="Unauthorized access")
     context = controller.search_and_retrieve_result(body.question)
 
     answer = generate.get_message(body.question, context, model="gpt-4-turbo")

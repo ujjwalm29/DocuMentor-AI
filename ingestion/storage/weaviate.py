@@ -1,4 +1,6 @@
+import datetime
 import os
+from datetime import time
 from typing import List, Dict
 from uuid import uuid4, UUID
 import logging
@@ -7,8 +9,9 @@ import weaviate
 from ingestion.storage.storage import Storage
 from dotenv import load_dotenv
 from weaviate.classes.config import Property, DataType
+from weaviate.classes.query import Filter
 from ingestion.chunking.Chunk import ChildChunk, ParentChunk
-from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME
+from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME, DOCUMENT_INDEX_NAME
 from dataclasses import asdict, is_dataclass
 
 logger = logging.getLogger(__name__)
@@ -20,7 +23,8 @@ property_name_map = {
     UUID: DataType.UUID,
     UUID | None: DataType.UUID,
     object: DataType.TEXT,
-    int: DataType.INT
+    int: DataType.INT,
+    time: DataType.DATE
 }
 
 
@@ -77,7 +81,10 @@ class Weaviate(Storage):
                     property_value = {
                         "text": props['text'],
                         "prev_id": props['prev_id'],
-                        "next_id": props['next_id']
+                        "next_id": props['next_id'],
+                        "user_id": props['user_id'],
+                        "document_id": props['document_id']
+
                     }
 
                     if index_name.lower() == CHILD_CHUNKS_INDEX_NAME:
@@ -95,15 +102,16 @@ class Weaviate(Storage):
         if self.client.collections.exists(index_name):
             self.client.collections.delete(index_name)
 
-    def get_element_by_chunk_id(self, index_name: str, element_id: uuid4) -> ChildChunk:
+    def get_element_by_chunk_id(self, index_name: str, element_id: UUID) -> ChildChunk:
         logger.debug(f"get_element_by_chunk_id called for ID {element_id} Index {index_name}")
-        element = self.client.collections.get(index_name).query.fetch_object_by_id(str(element_id))
+        element = self.client.collections.get(index_name).query.fetch_object_by_id(element_id)
 
         return self.create_chunk_from_weaviate_objects(index_name, element)
 
-    def vector_search(self, index_name: str, query_vector, number_of_results: int = 20):
+    def vector_search(self, user_id: UUID, index_name: str, query_vector, number_of_results: int = 20):
         logger.debug(f"vector search Index {index_name}")
         response = self.client.collections.get(index_name).query.near_vector(
+            filters=Filter.by_property("user_id").equal(user_id),
             near_vector=query_vector.tolist(),
             limit=number_of_results
         )
@@ -117,9 +125,10 @@ class Weaviate(Storage):
 
         return response_chunks
 
-    def hybrid_search(self, index_name: str, query_vector, query_str: str, number_of_results: int = 20, query_properties: List[str]="text"):
+    def hybrid_search(self, user_id: UUID, index_name: str, query_vector, query_str: str, number_of_results: int = 20, query_properties: List[str]="text"):
         logger.debug(f"hybrid search Index {index_name}, Query {query_str}, Query Properties {query_properties}")
         response = self.client.collections.get(index_name).query.hybrid(
+            filters=Filter.by_property("user_id").equal(user_id),
             query=query_str,
             query_properties=[query_properties],
             vector=query_vector.tolist(),
@@ -132,6 +141,28 @@ class Weaviate(Storage):
             response_chunks.append(self.create_chunk_from_weaviate_objects(index_name, obj))
 
         return response_chunks
+
+
+    def add_doc_for_user(self, name: str, document_id: UUID, user_id: UUID):
+        self.client.collections.get(DOCUMENT_INDEX_NAME).data.insert({
+            "name": name,
+            "document_id": document_id,
+            "user_id": user_id,
+            "added_at": datetime.datetime.now()
+        })
+
+
+    def delete_doc_from_db(self, document_id: UUID, user_id: UUID):
+        # TODO : Check if document_id belongs to user
+        self.client.collections.get(DOCUMENT_INDEX_NAME).data.delete_many(
+            where=Filter.by_property("document_id").contains_any([document_id])
+        )
+
+
+    def delete_chunks_for_doc_id(self, document_id: UUID, user_id: UUID):
+        # TODO : Implement this
+        pass
+
 
     def close_connection(self):
         logger.info("Closing weaviate client connection")
@@ -147,7 +178,9 @@ class Weaviate(Storage):
                 prev_id=obj.properties['prev_id'],
                 text=obj.properties['text'],
                 embeddings=[],
-                metadata={}
+                metadata={},
+                user_id=obj.properties['user_id'],
+                document_id=obj.properties['document_id']
             )
         else:
             return ParentChunk(
@@ -157,5 +190,7 @@ class Weaviate(Storage):
                 prev_id=obj.properties['prev_id'],
                 text=obj.properties['text'],
                 embeddings=[],
-                metadata={}
+                metadata={},
+                user_id=obj.properties['user_id'],
+                document_id=obj.properties['document_id']
             )

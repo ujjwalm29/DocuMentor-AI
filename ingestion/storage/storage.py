@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 from ingestion.chunking.Chunk import ChunkBase
 
@@ -31,17 +31,29 @@ class Storage(ABC):
 
 
     @abstractmethod
-    def get_element_by_chunk_id(self, index_name: str, element_id: uuid4) -> ChunkBase:
+    def get_element_by_chunk_id(self, index_name: str, element_id: UUID) -> ChunkBase:
         pass
 
 
     @abstractmethod
-    def vector_search(self, index_name: str, query_vector, number_of_results: int) -> List[ChunkBase]:
+    def vector_search(self, user_id: UUID, index_name: str, query_vector, number_of_results: int) -> List[ChunkBase]:
         pass
 
 
     @abstractmethod
-    def hybrid_search(self, index_name: str, query_vector, query_str: str, number_of_results: int, query_properties: List[str]) -> List[ChunkBase]:
+    def hybrid_search(self, user_id: UUID, index_name: str, query_vector, query_str: str, number_of_results: int, query_properties: List[str]) -> List[ChunkBase]:
+        pass
+
+    @abstractmethod
+    def add_doc_for_user(self, name: str, document_id: UUID, user_id: UUID):
+        pass
+
+    @abstractmethod
+    def delete_doc_from_db(self, document_id: UUID, user_id: UUID):
+        pass
+
+    @abstractmethod
+    def delete_chunks_for_doc_id(self, document_id: UUID, user_id: UUID):
         pass
 
 
