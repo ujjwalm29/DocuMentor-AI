@@ -29,11 +29,21 @@ property_name_map = {
 
 
 class Weaviate(Storage):
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(Weaviate, cls).__new__(cls)
+            # Put any initialization here that should only happen once
+            logger.info("Initializing connection to weaviate database")
+            cls._instance.client = weaviate.connect_to_local(
+                host=os.getenv("WEAVIATE_HOST"),
+                port=int(os.getenv("WEAVIATE_PORT"))
+            )
+        return cls._instance
 
     def __init__(self):
         super().__init__()
-        logger.info("Initializing connection to weaviate database")
-        self.client = weaviate.connect_to_local(host=os.getenv("WEAVIATE_HOST"), port=int(os.getenv("WEAVIATE_PORT")))
 
 
     def create_new_index(self, index_name: str, index_properties: Dict):

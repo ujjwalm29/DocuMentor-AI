@@ -1,12 +1,9 @@
 llama-parse
 python-dotenv
-pandas
 numpy
-spacy
 langchain
 langchain-ai21
 sentence-transformers
-scikit-learn
 openai
 anthropic
 weaviate-client

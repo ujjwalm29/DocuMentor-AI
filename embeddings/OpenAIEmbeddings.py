@@ -1,6 +1,5 @@
 from typing import List
 
-import pandas as pd
 from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os

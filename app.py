@@ -61,8 +61,8 @@ async def question_answer(key: str, body: Question):
         raise HTTPException(status_code=401, detail="Unauthorized access")
     context = controller.search_and_retrieve_result(body.question)
 
-    answer = generate.get_message(body.question, context, model="gpt-4-turbo")
-    # answer = generate.get_message(body.question, context)
+    # answer = generate.get_message(body.question, context, model="gpt-4-turbo")
+    answer = generate.get_message(body.question, context)
 
     return {"answer": answer}
 

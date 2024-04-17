@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-import pandas as pd
 from ingestion.chunking.Chunk import ChunkBase
 
 

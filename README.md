@@ -96,13 +96,14 @@ Q&A for pdfs.
     - Remove document?
       - Each doc indexed needs to have an ID. Each chunk needs a doc ID. Enter doc ID to delete - ✅
   - Create Streamlit UI
-  - Storage should be a singleton dependency
+  - Storage should be a singleton dependency - ✅
   - Deployment stuff
-    - Docker
+    - Docker  ✅
     - docker compose
   - What if multiple users use it?
     - Added user_id to the schema - ✅
   - Tests :(
+  - Error Handling
 - PI removal 
 - Evaluation using Tru Lens
 - Multi-Query(Query Expansion)
@@ -111,6 +112,12 @@ Q&A for pdfs.
   - Using LLMs : Feed the query to an LLM, ask it to expand on it and give 3 alternatives. Search and aggregate results.
 - Summarization pipeline
   - Sometimes, people just want summaries of pdfs.
+  - Use OpenAI GPT 4 Turbo with batch functionality
+    - Store the file in OpenAI storage
+    - Create a batch with summary prompt - Store the batch ID somewhere
+    - Create a cron job like process(is that a webhook?) to check whether job is complete.
+    - Store summary in separate index with doc_id as key.
+    - Find a way to decide whether user is asking for summary or a specific question. (Use an LLM?)
 - How does one build a chat interface over RAG?
   - Let's say, I ask a question and get an answer. What's next?
   - Is the next prompt considered a new question? Do we do retrieval -> generation?
