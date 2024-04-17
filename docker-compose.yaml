@@ -1,0 +1,36 @@
+version: "3.4"
+services:
+  server:
+    build: .
+    image: pdfreader:0.1
+    ports:
+      - "8000:80"
+    networks:
+      - mynetwork
+    env_file:
+      - .env
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.24.8
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    restart: on-failure
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      ENABLE_MODULES: ''
+      CLUSTER_HOSTNAME: 'node1'
+    networks:
+      - mynetwork
+
+volumes:
+  weaviate_data:
+
+networks:
+  mynetwork:
+    driver: bridge
+...

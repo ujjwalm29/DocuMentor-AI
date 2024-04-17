@@ -5,3 +5,5 @@
 data/*/*
 __pycache__
 *.json
+.DS_STORE
+venv

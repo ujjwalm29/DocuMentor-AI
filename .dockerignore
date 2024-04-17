@@ -1,0 +1,7 @@
+./venv
+.env
+*.pkl
+.idea/
+data/*/*
+__pycache__
+*.json
