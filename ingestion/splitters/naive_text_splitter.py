@@ -1,4 +1,4 @@
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 from ingestion.splitters.text_splitter import TextSplitter
 
 

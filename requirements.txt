@@ -1,7 +1,7 @@
 llama-parse
 python-dotenv
 numpy
-langchain
+langchain-text-splitters
 langchain-ai21
 sentence-transformers
 openai

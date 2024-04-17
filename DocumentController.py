@@ -45,7 +45,7 @@ Convert tables into a list of facts. Do not include "Research Paper" in the fina
 
         text = await self.pdf_parser.get_text_from_pdf(file_path)
 
-        chunker = Chunker()
+        chunker = Chunker(self.embedding)
 
         print(user_id)
         doc_id = uuid.uuid4()

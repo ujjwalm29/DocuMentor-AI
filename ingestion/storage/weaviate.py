@@ -122,7 +122,7 @@ class Weaviate(Storage):
         logger.debug(f"vector search Index {index_name}")
         response = self.client.collections.get(index_name).query.near_vector(
             filters=Filter.by_property("user_id").equal(user_id),
-            near_vector=query_vector.tolist(),
+            near_vector=query_vector,
             limit=number_of_results
         )
 
@@ -141,7 +141,7 @@ class Weaviate(Storage):
             filters=Filter.by_property("user_id").equal(user_id),
             query=query_str,
             query_properties=[query_properties],
-            vector=query_vector.tolist(),
+            vector=query_vector,
             limit=number_of_results
         )
 

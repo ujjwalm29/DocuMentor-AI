@@ -30,4 +30,4 @@ class LocalEmbeddings(Embeddings):
 
 
     def get_embedding(self, input_str):
-        return self.model.encode(input_str)
+        return self.model.encode(input_str).tolist()

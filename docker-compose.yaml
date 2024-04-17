@@ -2,7 +2,7 @@ version: "3.4"
 services:
   server:
     build: .
-    image: pdfreader:0.1
+    image: ujjwalm29/pdfreader:v0.1
     ports:
       - "8000:80"
     networks:

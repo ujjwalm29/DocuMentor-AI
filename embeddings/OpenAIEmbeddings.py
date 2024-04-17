@@ -3,7 +3,7 @@ from typing import List
 from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
-import Embeddings
+from embeddings.Embeddings import Embeddings
 from ingestion.chunking.Chunk import ChunkBase
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

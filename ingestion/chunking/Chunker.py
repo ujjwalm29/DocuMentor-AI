@@ -1,16 +1,16 @@
 from typing import List
 
+from embeddings.Embeddings import Embeddings
 from ingestion.chunking.Chunk import ParentChunk, ChildChunk
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from embeddings.LocalHFEmbeddings import LocalEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 import math
 import uuid
 
 
 class Chunker:
 
-    def __init__(self):
-        self.embedding_generator = LocalEmbeddings()
+    def __init__(self, embedding_generator: Embeddings):
+        self.embedding_generator = embedding_generator
 
         self.child_parent_ratio = 4
         self.child_text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
