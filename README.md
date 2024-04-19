@@ -99,7 +99,7 @@ Q&A for pdfs.
   - Storage should be a singleton dependency - ✅
   - Deployment stuff
     - Docker  ✅
-    - docker compose
+    - docker compose  ✅
   - What if multiple users use it?
     - Added user_id to the schema - ✅
   - Tests :(
