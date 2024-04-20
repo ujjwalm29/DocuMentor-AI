@@ -23,7 +23,7 @@ class Chat(ABC):
 
         context_string = []
 
-        for context, i in enumerate(contexts):
+        for i, context in enumerate(contexts):
             context_string.append(f"""
             ```
             context {i} : {context}
@@ -43,6 +43,7 @@ class Chat(ABC):
         multiple perspectives of the given query. Generate upto 5 alternate queries. Each query on new line.
         Input Query : {query}    
         NO EXTRA INFORMATION OR TEXT SHOULD BE ADDED TO OUTPUT. JUST THE GENERATED QUERIES.
+        DO NOT ADD THINGS LIKE "Here are 5 alternate queries:" OR ANY OTHER EXTRA INFORMATION.
         """
 
     @abstractmethod

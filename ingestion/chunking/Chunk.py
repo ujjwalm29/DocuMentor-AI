@@ -27,6 +27,7 @@ class ParentChunk(ChunkBase):
 class ChildChunk(ChunkBase):
 
     parent_id: UUID | None
+    score: int = 0
 
 
 @dataclass

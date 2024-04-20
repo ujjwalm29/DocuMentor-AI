@@ -13,3 +13,7 @@ class Embeddings(ABC):
     @abstractmethod
     def get_embedding(self, input_str):
         pass
+
+    @abstractmethod
+    def get_embeddings_for_list(self, list_of_str: List[str]):
+        pass

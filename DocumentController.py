@@ -12,6 +12,7 @@ from ingestion.storage.storage import Storage
 from ingestion.storage.weaviate import Weaviate
 from ingestion.chunking.Chunker import Chunker
 from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME, DOCUMENT_INDEX_NAME
+from query_translation.multi_query import MultiQueryTranslator
 from query_translation.query_translator import QueryTranslator
 from query_translation.simple_translator import SimpleTranslator
 from retrieval.base_retrieval import Retrieval
@@ -40,7 +41,7 @@ Convert tables into a list of facts. Do not include "Research Paper" or any othe
         self.storage = storage
         self.retrieval = retrieval
         self.pdf_parser = pdf_parser
-        self.query_translator: QueryTranslator = SimpleTranslator()
+        self.query_translator: QueryTranslator = MultiQueryTranslator()
 
 
     async def process_text_and_store(self, file_path: str, user_id: UUID = UUID("a84080ee-b3d3-4269-bb8a-ff3887a90edb")):

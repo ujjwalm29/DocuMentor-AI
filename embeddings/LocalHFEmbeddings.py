@@ -31,3 +31,18 @@ class LocalEmbeddings(Embeddings):
 
     def get_embedding(self, input_str):
         return self.model.encode(input_str).tolist()
+
+
+    def get_embeddings_for_list(self, list_of_str: List[str]):
+        embeddings = self.model.encode(list_of_str, batch_size=32)
+
+        final_obj = []
+
+        for text, embedding in zip(list_of_str, embeddings):
+            obj = {
+                "text": text,
+                "embedding": embedding.tolist()
+            }
+            final_obj.append(obj)
+
+        return final_obj

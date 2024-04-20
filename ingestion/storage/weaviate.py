@@ -9,7 +9,7 @@ import weaviate
 from ingestion.storage.storage import Storage
 from dotenv import load_dotenv
 from weaviate.classes.config import Property, DataType
-from weaviate.classes.query import Filter
+from weaviate.classes.query import Filter, MetadataQuery
 from ingestion.chunking.Chunk import ChildChunk, ParentChunk
 from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME, DOCUMENT_INDEX_NAME
 from dataclasses import asdict, is_dataclass
@@ -139,13 +139,14 @@ class Weaviate(Storage):
         return response_chunks
 
     def hybrid_search(self, user_id: UUID, index_name: str, query_vector, query_str: str, number_of_results: int = 20, query_properties: List[str]="text"):
-        logger.debug(f"hybrid search Index {index_name}, Query {query_str}, Query Properties {query_properties}")
+        logger.debug(f"hybrid search Index: {index_name}, Query : {query_str}, Query Properties : {query_properties}")
         response = self.client.collections.get(index_name).query.hybrid(
             filters=Filter.by_property("user_id").equal(user_id),
             query=query_str,
             query_properties=[query_properties],
             vector=query_vector,
-            limit=number_of_results
+            limit=number_of_results,
+            return_metadata=MetadataQuery(score=True)
         )
 
         response_chunks = []
@@ -195,7 +196,8 @@ class Weaviate(Storage):
                 embeddings=[],
                 metadata={},
                 user_id=obj.properties['user_id'],
-                document_id=obj.properties['document_id']
+                document_id=obj.properties['document_id'],
+                score=getattr(obj.metadata, 'score', 0)
             )
         else:
             return ParentChunk(

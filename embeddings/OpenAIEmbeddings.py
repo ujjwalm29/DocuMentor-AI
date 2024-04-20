@@ -41,3 +41,7 @@ class OpenAIEmbeddings(Embeddings):
 
     def get_embedding(self, input_str):
         return self.client.embeddings.create(input=[input_str], model=self.model).data[0].embedding
+
+    def get_embeddings_for_list(self, list_of_str: List[str]):
+        raise NotImplementedError()
+        pass
