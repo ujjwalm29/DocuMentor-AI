@@ -12,6 +12,8 @@ from ingestion.storage.storage import Storage
 from ingestion.storage.weaviate import Weaviate
 from ingestion.chunking.Chunker import Chunker
 from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME, DOCUMENT_INDEX_NAME
+from query_translation.query_translator import QueryTranslator
+from query_translation.simple_translator import SimpleTranslator
 from retrieval.base_retrieval import Retrieval
 from retrieval.sentence_window import SentenceWindowRetrieval
 from retrieval.auto_merge import AutoMergeRetrieval
@@ -38,6 +40,7 @@ Convert tables into a list of facts. Do not include "Research Paper" or any othe
         self.storage = storage
         self.retrieval = retrieval
         self.pdf_parser = pdf_parser
+        self.query_translator: QueryTranslator = SimpleTranslator()
 
 
     async def process_text_and_store(self, file_path: str, user_id: UUID = UUID("a84080ee-b3d3-4269-bb8a-ff3887a90edb")):
@@ -66,8 +69,7 @@ Convert tables into a list of facts. Do not include "Research Paper" or any othe
     def search_and_retrieve_result(self, query: str, user_id: UUID = UUID("a84080ee-b3d3-4269-bb8a-ff3887a90edb")):
         logging.debug(f"Starting search and retrieve")
 
-        vector = self.embedding.get_embedding(query)
-        results = self.storage.hybrid_search(user_id=user_id, index_name=CHILD_CHUNKS_INDEX_NAME, query_vector=vector, query_str=query)
+        results = self.query_translator.translate_query_and_generate_context(user_id, self.storage, query, self.embedding)
         final_context = self.retrieval.get_context(results)
         logging.debug(f"Final context retrieved : f{final_context}")
 
