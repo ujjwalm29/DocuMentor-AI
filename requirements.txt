@@ -11,3 +11,4 @@ fastapi
 uvicorn
 python-multipart
 trulens-eval==0.27.2
+groq
