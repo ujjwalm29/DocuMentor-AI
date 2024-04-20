@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 
 class Chat(ABC):
@@ -34,6 +35,21 @@ class Chat(ABC):
     Do NOT add any of your own information.
     """
 
+    def get_multiple_queries_prompt(self, query: str):
+        return f"""
+        You are a very smart AI agent. Your task is to generate multiple queries from the given query.
+        Do NOT add extra things not mentioned in the query given. Think about what are the different ways in which 
+        this query can be represented. What are some context appropriate synonyms that could be used? Generate 
+        multiple perspectives of the given query. Generate upto 5 alternate queries. Each query on new line.
+        Input Query : {query}    
+        NO EXTRA INFORMATION OR TEXT SHOULD BE ADDED TO OUTPUT. JUST THE GENERATED QUERIES.
+        """
+
     @abstractmethod
-    def get_message(self, query, context, model):
+    def get_final_generated_message(self, query, context, model):
+        pass
+
+
+    @abstractmethod
+    def get_multiple_queries(self, query) -> List[str]:
         pass

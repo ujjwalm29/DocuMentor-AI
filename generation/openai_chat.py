@@ -12,17 +12,26 @@ class ChatOpenAI(Chat):
 
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    def get_message(self, query, context, model: str = "gpt-3.5-turbo"):
-        logger.debug(f"OpenAI API being called query:{query} , context:{context}, model:{model}")
-
+    def get_final_generated_message(self, query, context, model: str = "gpt-3.5-turbo"):
         content = super().get_user_rag_prompt(query, context)
-        logger.debug(f"User message for API f{content}")
+        return self.call_api(query, model, super().get_system_prompt(), content)
+
+    def get_multiple_queries(self, query):
+        queries = self.call_api(query, user_message=super().get_multiple_queries_prompt(query))
+        return queries.split('\n')
+
+    def call_api(self, query, model: str = "gpt-3.5-turbo", system_prompt: str = "", user_message=""):
+        logger.debug(f"OpenAI API being called query:{query} , user_message:{user_message}, model:{model}")
+
+        if system_prompt == "":
+            system_prompt = "You are a helpful AI assistant."
+
 
         completion = self.client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"{super().get_system_prompt()}"},
-                {"role": "user", "content": f"{content}"}
+                {"role": "system", "content": f"{system_prompt}"},
+                {"role": "user", "content": f"{user_message}"}
             ]
         )
         logger.debug(f"OpenAI API Response {completion}")

@@ -79,6 +79,7 @@ class Weaviate(Storage):
 
     def add_data_to_index(self, index_name: str, data: List):
         logger.info(f"Adding data to index {index_name}")
+        logger.debug(f"Number of items being added : {len(data)}")
         logger.debug(f"Data {data}")
         collection = self.client.collections.get(index_name.lower())
 
@@ -102,6 +103,8 @@ class Weaviate(Storage):
                     else:
                         property_value['number_of_children'] = props['number_of_children']
 
+                    logger.debug(f"Property value {property_value}")
+                    logger.debug(f"Obj Vector {obj_vector}")
                     batch.add_object(properties=property_value, vector=obj_vector, uuid=props['chunk_id'])
 
 
@@ -146,6 +149,8 @@ class Weaviate(Storage):
         )
 
         response_chunks = []
+
+        logger.debug(f"Response from weaviate for hybrid search : {response}")
 
         for obj in response.objects:
             response_chunks.append(self.create_chunk_from_weaviate_objects(index_name, obj))

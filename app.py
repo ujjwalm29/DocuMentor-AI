@@ -62,7 +62,7 @@ async def question_answer(key: str, body: Question):
     context = controller.search_and_retrieve_result(body.question)
 
     # answer = generate.get_message(body.question, context, model="gpt-4-turbo")
-    answer = generate.get_message(body.question, context)
+    answer = generate.get_final_generated_message(body.question, context, )
 
     return {"answer": answer}
 

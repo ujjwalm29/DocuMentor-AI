@@ -16,7 +16,7 @@ class RAG_from_scratch:
     @instrument
     def generate_completion(self, query: str, context_str: list) -> str:
         generate = ChatOpenAI()
-        answer = generate.get_message(query, context_str)
+        answer = generate.get_final_generated_message(query, context_str, )
         return answer
 
     @instrument

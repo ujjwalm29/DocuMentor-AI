@@ -7,3 +7,5 @@ __pycache__
 *.json
 .DS_STORE
 venv
+evaluation/default.sqlite
+evaluation/.streamlit

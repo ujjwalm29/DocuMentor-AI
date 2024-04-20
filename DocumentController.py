@@ -29,8 +29,8 @@ class DocumentController:
                  storage: Storage = Weaviate(),
                  retrieval: Retrieval = SentenceWindowRetrieval(adjacent_neighbor_window_size=1),
                  pdf_parser: PdfParser = PdfParser(parsing_instructs="""
-You are parsing a research paper. DO NOT parse or include the references section or any metadata or acknowledgments in the output.
-Convert tables into a list of facts. Do not include "Research Paper" in the final md file.
+You are parsing educational information. DO NOT include the references section or any metadata or acknowledgments in the output.
+Convert tables into a list of facts. Do not include "Research Paper" or any other term repeatedly in the final md file.
 """)):
         logging.info("Init Doc Controller")
         self.splitter = splitter
