@@ -2,7 +2,9 @@
 .env
 *.pkl
 .idea/
-data/*/*
+data/markdowns/*
+data/pdf/*
+data/pkl/*
 __pycache__
 *.json
 .DS_STORE
