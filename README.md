@@ -1,11 +1,11 @@
-# Document question, answering and summarizing using LLMs
+# Document question, answering and summarizing using LLMs 🚀
 
 A fully functional document question-answering & summarization app that uses advanced Retrieval Augmented Generation(RAG) to answer questions about private data.
 Everything has been implemented from scratch without using any frameworks.
 
 Tech Used : `Retrieval Augmented Generation(RAG)`, `Artificial Intelligence(AI)`, `Large language models(LLMs)`, `Generative AI`, 
 `Embedding Models`, `Natural Language Processing(NLP)`, `Vector Database`, `Vector Search`, `Hybrid Search`, `Rerankers`, `Reciprocal Rank Fusion(RRF)`,
-`Fine Tuning LLMs`, `RESTful APIs`
+`Fine Tuning LLMs`, `RAG Evalution`, `Docker`, `Docker Compose`, `RESTful APIs`
 
 ## Why RAG?
 
@@ -16,9 +16,22 @@ Enter RAG. A clean way of using Generative AI over proprietary and "moving" data
 
 ## Details of RAG pipeline
 
-RAG is split into 2 phases : 
-- Ingestion
-- Query
+- [Ingestion Phase](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#ingestion-phase)
+  - [Documents](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#documents)
+  - [Parsing](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#parsing)
+  - [Splitting](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#splitting)
+  - [Chunking](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#chunking)
+  - [Embeddings/Indexing](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#embeddings--indexing)
+  - [Vector Databases](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#vector-databasedatabase)
+- [Query Phase](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#query-phase)
+  - [Application Server](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#application-server)
+  - [Query Translation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#query-translator-vector-database)
+  - [Reranking](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#reranking)
+  - [Advanced Retrieval Strategy](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy)
+  - [Generation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy)
+- Bonus!
+  - [RAG Evaluation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy)
+  - [Deployment](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy)
 
 ## Ingestion phase
 
@@ -27,18 +40,18 @@ First, let's talk about the document ingestion pipeline.
 ![Ingestion pipeline](data/images/Ingestion_Pipeline.png "Ingestion Pipeline")
 
 
-### Documents
+### Documents 📚
 
 The term "Documents" here means whatever data you would like to do RAG over. This could be documents like pdf, docx etc or something else like webpages.
 
-### Parsing
+### Parsing 📠
 
 This is the first step in our RAG pipeline. Before we attempt to make sense of the data, we need to make sure it's clean and in an easily readable form.
 With respect to PDFs : What happens to tables in the documents? What happens to images? Do we need all sections of the PDF? 
 All of these things are taken care of in the parsing stage.
 In this application, PDF parsing is implemented using [Llamaparse](https://www.llamaindex.ai/blog/introducing-llamacloud-and-llamaparse-af8cedf9006b).
 
-### Splitting
+### Splitting ✂️
 
 Now, we have the data in a readable format. What do we do this data?
 - One option would be to store the entire document as 1 record. This has a few problems:
@@ -57,7 +70,7 @@ The question is, how do we split our documents? Here are some options implemente
 
 For all of the splitters, a `chunk_size` and `chunk_overlap` can be given.
 
-### Chunking
+### Chunking 🏷️
 
 At this stage, all our text is split into small pieces. Neat!
 
@@ -74,7 +87,7 @@ So, we create 2 structures here :
 
 As the picture shows, the chunks are linked to each other by a doubly linked list data structure. All those years of leetcode, finally useful :)
 
-### Embeddings / Indexing
+### Embeddings / Indexing 🧠
 
 Once we have our chunks created, we need to be ready to index our data. Generally, there are 3 ways to do this.
 - Keyword indexing : In this process, we would split the text and create TF-IDF sparse vectors. We would generally store these in something like Elasticsearch, Solr or OpenSearch. This is explained in depth in my information retrieval and search tutorial [here](https://github.com/ujjwalm29/movie-search). 
@@ -91,7 +104,7 @@ To create vectors, this tool supports 2 methods :
   - Advantages : No need to own powerful machine, everything is through API
   - Disadvantages : Costs money(not very much); if there is API outage, app is at risk; OpenAI could stop supporting a model
 
-### Vector Database/Database
+### Vector Database/Database 💾
 
 After doing all of the above tasks, we are FINALLY ready to push our data into a database.
 
@@ -105,7 +118,7 @@ For this application, I am using Weaviate to store data.
 **Now, our data is neatly stored and ready to be queried in all sorts of ways!**
 
 
-## Query phase
+## Query phase 
 
 Let's talk about the query pipeline.
 
@@ -113,12 +126,12 @@ Let's talk about the query pipeline.
 
 For the purpose of explaining each section, let's assume a document about fruits is indexed into the DB.
 
-### Application Server
+### Application Server 💻
 
 This is a basic application server created using FastAPI. Handles incoming files, queries etc.
 Eventually will include general application logic like authentication, sessions etc.
 
-### Query Translator, Vector Database
+### Query Translator, Vector Database 🤖
 
 Let's say a child is using our application. They want to know why should we eat apples. But they are a child. So they enter the query "why eat apple?".
 
@@ -136,7 +149,7 @@ If you're a software engineer, you might be thinking "isn't this hella slow?". Y
 
 FYI, a SimpleQueryTranslator is also implemented to not do any query translations and use the query directly to get results.
 
-### Reranking
+### Reranking 🥇
 
 This is an optional step. [Cohere AI](https://cohere.com/) has a neat reranking model available through API. 
 If you are a big consumer company, you probably have a ML model specifically for ranking. You could use that here. 
@@ -144,7 +157,7 @@ If you are a big consumer company, you probably have a ML model specifically for
 Reranking can be used to get better context for our upcoming phases.
 
 
-### Advanced Retrieval Strategy
+### Advanced Retrieval Strategy ⚡
 
 As input, we have a list of `N` chunks ranked from 1 to N.
 
@@ -180,7 +193,7 @@ That's what we do. Whenever we see that any parent node has greater than or equa
 
 Advanced retrieval strategies were my favorite part to implement!
 
-### Final Generation
+### Final Generation 🧠
 
 In this phase, we receive a final set of context. To generate the final answer, we pass on the context to a LLM and ask it to generate an answer which is grounded in the context.
 The main thing required for this operation is good prompt engineering skills.
@@ -196,6 +209,20 @@ Please reach out to ujjwalm29@gmail.com or [LinkedIn](https://www.linkedin.com/i
 
 
 FYI, this is work in progress so stay tuned for updates and more features!
+
+## Bonus - RAG Evaluation
+
+How do we know whether our RAG solution works? Is the retrieval relevant? Is the LLM hallucinating responses?
+Most people end up going by "Vibes". They might say "This looks good". What does "good" mean?
+
+Hence, **a RAG solution needs some kind of evaluation framework**. 
+
+In this application, the [TruLens](https://www.trulens.org/) framework is used to check Groundedness, Context Relevance and Safety
+Having a readily available evaluation framework embedded into the application allows us to iterate and make our product better.
+
+## Bonus - Deployment
+
+The app has a `Dockerfile` and `docker-compose` file attached. Setup your `.env` file and give it a go! 
 
 
 
