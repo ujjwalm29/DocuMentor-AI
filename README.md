@@ -3,6 +3,10 @@
 A fully functional document question-answering & summarization app that uses advanced Retrieval Augmented Generation(RAG) to answer questions about private data.
 Everything has been implemented from scratch without using any frameworks.
 
+Tech Used : `Retrieval Augmented Generation(RAG)`, `Artificial Intelligence(AI)`, `Large language models(LLMs)`, `Generative AI`, 
+`Embedding Models`, `Natural Language Processing(NLP)`, `Vector Database`, `Vector Search`, `Hybrid Search`, `Rerankers`, `Reciprocal Rank Fusion(RRF)`,
+`Fine Tuning LLMs`, `RESTful APIs`
+
 ## Why RAG?
 
 Using tools like ChatGPT and Gemini is nice. **But what most companies want is, a way to use Generative AI on some proprietary data.**
