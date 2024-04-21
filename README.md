@@ -17,21 +17,21 @@ Enter RAG. A clean way of using Generative AI over proprietary and "moving" data
 ## Details of RAG pipeline
 
 - [Ingestion Phase](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#ingestion-phase)
-  - [Documents](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#documents)
-  - [Parsing](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#parsing)
-  - [Splitting](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#splitting)
-  - [Chunking](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#chunking)
-  - [Embeddings/Indexing](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#embeddings--indexing)
-  - [Vector Databases](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#vector-databasedatabase)
+  - [Documents](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#documents-)
+  - [Parsing](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#parsing-)
+  - [Splitting](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#splitting-%EF%B8%8F)
+  - [Chunking](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#chunking-%EF%B8%8F)
+  - [Embeddings/Indexing](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#embeddings--indexing-)
+  - [Vector Databases](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#vector-databasedatabase-)
 - [Query Phase](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#query-phase)
-  - [Application Server](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#application-server)
-  - [Query Translation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#query-translator-vector-database)
-  - [Reranking](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#reranking)
-  - [Advanced Retrieval Strategy](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy)
-  - [Generation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy)
+  - [Application Server](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#application-server-)
+  - [Query Translation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#query-translator-vector-database-)
+  - [Reranking](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#reranking-)
+  - [Advanced Retrieval Strategy](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy-)
+  - [Generation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#final-generation-)
 - Bonus!
-  - [RAG Evaluation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy)
-  - [Deployment](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#advanced-retrieval-strategy)
+  - [RAG Evaluation](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#bonus---rag-evaluation)
+  - [Deployment](https://github.com/ujjwalm29/pdf-reader?tab=readme-ov-file#bonus---deployment)
 
 ## Ingestion phase
 
