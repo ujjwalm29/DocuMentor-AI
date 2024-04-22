@@ -5,6 +5,7 @@ from generation.openai_chat import ChatOpenAI
 from util import setup_logging
 
 from fastapi import FastAPI, UploadFile, HTTPException, status, Response
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import logging
 import os
@@ -14,6 +15,20 @@ load_dotenv()
 setup_logging()
 logger = logging.getLogger(__name__)
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",  # Local front-end
+    "https://www.example.com",
+]
+
+# Add middleware to allow cross-origin requests from the specified origins.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows specified origins to make requests.
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods.
+    allow_headers=["*"],  # Allows all headers.
+)
 
 controller = DocumentController()
 generate = ChatOpenAI()
