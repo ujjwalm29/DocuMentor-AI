@@ -35,12 +35,12 @@ class Chat(ABC):
     Do NOT add any of your own information.
     """
 
-    def get_multiple_queries_prompt(self, query: str):
+    def get_multiple_queries_prompt(self, query: str, number_of_queries: int = 3):
         return f"""
         You are a very smart AI agent. Your task is to generate multiple queries from the given query.
         Do NOT add extra things not mentioned in the query given. Think about what are the different ways in which 
         this query can be represented. What are some context appropriate synonyms that could be used? Generate 
-        multiple perspectives of the given query. Generate upto 5 alternate queries. Each query on new line.
+        multiple perspectives of the given query. Generate upto {number_of_queries} alternate queries. Each query on new line.
         Input Query : {query}    
         NO EXTRA INFORMATION OR TEXT SHOULD BE ADDED TO OUTPUT. JUST THE GENERATED QUERIES.
         DO NOT ADD THINGS LIKE "Here are 5 alternate queries:" OR ANY OTHER EXTRA INFORMATION.
@@ -52,5 +52,5 @@ class Chat(ABC):
 
 
     @abstractmethod
-    def get_multiple_queries(self, query) -> List[str]:
+    def get_multiple_queries(self, query, number_of_queries: int = 3) -> List[str]:
         pass

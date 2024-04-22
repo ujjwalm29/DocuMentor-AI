@@ -18,7 +18,7 @@ from query_translation.simple_translator import SimpleTranslator
 from retrieval.base_retrieval import Retrieval
 from retrieval.sentence_window import SentenceWindowRetrieval
 from retrieval.auto_merge import AutoMergeRetrieval
-from util import get_dataclass_fields
+from util import get_dataclass_fields, time_function, async_time_function
 
 
 class DocumentController:
@@ -43,7 +43,7 @@ Convert tables into a list of facts. Do not include "Research Paper" or any othe
         self.pdf_parser = pdf_parser
         self.query_translator: QueryTranslator = MultiQueryTranslator()
 
-
+    @async_time_function
     async def process_text_and_store(self, file_path: str, user_id: UUID = UUID("a84080ee-b3d3-4269-bb8a-ff3887a90edb")):
         logging.debug(f"Starting document parsing, text chunking and store")
 

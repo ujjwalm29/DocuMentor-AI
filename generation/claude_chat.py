@@ -16,7 +16,7 @@ class ChatClaude(Chat):
         content = super().get_user_rag_prompt(query, context)
         return self.call_api(query, model, super().get_system_prompt(), content)
 
-    def get_multiple_queries(self, query):
+    def get_multiple_queries(self, query, number_of_queries: int = 3):
         queries = self.call_api(query, user_message=super().get_multiple_queries_prompt(query))
         return queries.split('\n')
 

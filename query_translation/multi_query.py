@@ -8,6 +8,7 @@ from generation.groq_chat import ChatGroq
 from ingestion.storage.storage import Storage
 from query_translation.query_translator import QueryTranslator
 from collections import defaultdict
+from util import time_function
 
 logger = logging.getLogger(__name__)
 
@@ -18,13 +19,14 @@ class MultiQueryTranslator(QueryTranslator):
     Get context for all queries and apply Reciprocal Rank Fusion on results
     """
 
+    @time_function
     def translate_query_and_generate_context(self, user_id, storage: Storage, query: str, embedding_gen: Embeddings,
                                              number_of_results: int = 20, query_properties: List[str] = "text"):
 
         # Generate alternate queries
         chat: Chat = ChatGroq()
 
-        queries: List[str] = chat.get_multiple_queries(query)
+        queries: List[str] = chat.get_multiple_queries(query, 3)
         logger.debug(f"Alternate queries generated : {queries}")
 
         context = []

@@ -4,6 +4,8 @@ from retrieval.base_retrieval import Retrieval
 from constants import CHILD_CHUNKS_INDEX_NAME
 import logging
 
+from util import time_function
+
 logger = logging.getLogger(__name__)
 
 
@@ -17,6 +19,7 @@ class SentenceWindowRetrieval(Retrieval):
         self.adjacent_neighbor_window_size = adjacent_neighbor_window_size
         self.storage = storage
 
+    @time_function
     def get_context(self, top_results):
         logger.debug(f"Sentence Window Retrieval get_context called with top_results ${top_results}")
         top_results = top_results[:5]
