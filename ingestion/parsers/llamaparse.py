@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import os
 import logging
 
+from ingestion.parsers.base_parser_pdf import BaseParserPDF
+
 load_dotenv()
 logger = logging.getLogger(__name__)
 
@@ -12,7 +14,7 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-class PdfParser:
+class PdfParser(BaseParserPDF):
 
     def __init__(self, result_type: str = 'md', parsing_instructs: str = ""):
         self.result_type = result_type

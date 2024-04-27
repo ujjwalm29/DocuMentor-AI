@@ -5,7 +5,7 @@ from uuid import UUID
 from embeddings.Embeddings import Embeddings
 from embeddings.LocalHFEmbeddings import LocalEmbeddings
 from ingestion.chunking.Chunk import ChildChunk, ParentChunk, Document
-from ingestion.pdf import PdfParser
+from ingestion.parsers.llamaparse import PdfParser
 from ingestion.splitters.text_splitter import TextSplitter
 from ingestion.splitters.recursive_splitter import RecursiveTextSplitter
 from ingestion.storage.storage import Storage
@@ -14,11 +14,9 @@ from ingestion.chunking.Chunker import Chunker
 from constants import CHILD_CHUNKS_INDEX_NAME, PARENTS_CHUNK_INDEX_NAME, DOCUMENT_INDEX_NAME
 from query_translation.multi_query import MultiQueryTranslator
 from query_translation.query_translator import QueryTranslator
-from query_translation.simple_translator import SimpleTranslator
 from retrieval.base_retrieval import Retrieval
 from retrieval.sentence_window import SentenceWindowRetrieval
-from retrieval.auto_merge import AutoMergeRetrieval
-from util import get_dataclass_fields, time_function, async_time_function
+from util import get_dataclass_fields, async_time_function
 
 
 class DocumentController:
